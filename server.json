@@ -6,12 +6,12 @@
     "url": "https://github.com/pgg898200-ship-it/cloture",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "websiteUrl": "https://pgg898200-ship-it.github.io/cloture",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/pgg898200-ship-it/cloture/releases/download/v0.1.0/cloture-v0.1.0-linux-x86_64.tar.gz",
+      "identifier": "https://github.com/pgg898200-ship-it/cloture/releases/download/v0.2.0/cloture-v0.2.0-linux-x86_64.tar.gz",
       "transport": {
         "type": "stdio"
       }

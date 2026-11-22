@@ -198,7 +198,7 @@ jobs:
 
       - name: Build stripped WASM & package JS/TS SDK
         env:
-          RUSTFLAGS: "-C strip=symbols -C opt-level=s"
+          RUSTFLAGS: "-C strip=symbols -C opt-level=z"
         run: |
           cargo build --release -p cloture-core --target wasm32-unknown-unknown
           mkdir -p site/wasm release-assets stage

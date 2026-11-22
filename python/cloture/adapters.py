@@ -173,3 +173,94 @@ def audit_jsonl(
         seed=seed,
     )
     return NamedPanelAudit(judge_names=jcols, report=rep)
+
+
+def extract_openai_logprobs(
+    response,
+    candidate_tokens: Sequence[str],
+    *,
+    choice_index: int = 0,
+    token_index: int = 0,
+    temperature: float = 1.0,
+) -> List[float]:
+    """Extract normalized simplex probabilities directly from an OpenAI / vLLM / OpenRouter ChatCompletion.
+
+    Works with both SDK response objects (`response.choices[0].logprobs.content[0].top_logprobs`)
+    and raw JSON dicts (`response["choices"][0]["logprobs"]["content"][0]["top_logprobs"]`).
+    """
+    from .async_tools import extract_logprob_distribution
+
+    if isinstance(response, dict):
+        choices = response.get("choices") or []
+        choice = choices[choice_index]
+        logprobs_obj = choice.get("logprobs") or {}
+        content = logprobs_obj.get("content") or []
+        top_entries = content[token_index].get("top_logprobs") or []
+        lp_map = {str(e["token"]): float(e["logprob"]) for e in top_entries}
+    else:
+        choice = response.choices[choice_index]
+        content = choice.logprobs.content
+        top_entries = content[token_index].top_logprobs
+        lp_map = {str(e.token): float(e.logprob) for e in top_entries}
+
+    return extract_logprob_distribution(lp_map, candidate_tokens, temperature=temperature)
+
+
+def audit_promptfoo(
+    path: Union[str, Path],
+    *,
+    gold_var: str = "expected",
+    n_condorcet_sims: int = 2000,
+    n_perms: int = 2000,
+    n_boot: int = 1000,
+    seed: int = 42,
+) -> NamedPanelAudit:
+    """Audit a Promptfoo JSON output file (`promptfoo eval -o results.json`) across multiple providers.
+
+    Groups evaluations by test case (`testIdx`) and treats each distinct provider (`provider.label`
+    or `provider.id`) as a judge column.
+    """
+    raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    results = raw.get("results", raw)
+    if isinstance(results, dict):
+        results = results.get("results", [])
+    if not isinstance(results, list) or not results:
+        raise ValueError("Promptfoo JSON does not contain a non-empty results list")
+
+    by_test: Dict[int, Dict[str, str]] = {}
+    gold_by_test: Dict[int, str] = {}
+    providers_seen: set[str] = set()
+
+    for idx, entry in enumerate(results):
+        test_idx = int(entry.get("testIdx", idx))
+        prov = entry.get("provider", {})
+        if isinstance(prov, dict):
+            pname = str(prov.get("label") or prov.get("id") or f"provider_{idx}")
+        else:
+            pname = str(prov)
+        providers_seen.add(pname)
+        by_test.setdefault(test_idx, {})[pname] = "1" if entry.get("success") else "0"
+        if test_idx not in gold_by_test:
+            vars_dict = entry.get("vars") or {}
+            if gold_var in vars_dict and entry.get("response") is not None and entry.get("success") is None:
+                gold_by_test[test_idx] = str(vars_dict[gold_var])
+            else:
+                gold_by_test[test_idx] = "1"
+
+    jcols = sorted(providers_seen)
+    test_ids = [tid for tid in sorted(by_test.keys()) if all(p in by_test[tid] for p in jcols)]
+    if len(test_ids) < 2:
+        raise ValueError("Need at least 2 test cases evaluated by all providers")
+
+    raw_votes = [[by_test[tid][p] for p in jcols] for tid in test_ids]
+    raw_gold = [gold_by_test[tid] for tid in test_ids]
+    votes_ids, gold_ids, _ = _encode_labels(raw_votes, raw_gold)
+    rep = audit_panel(
+        votes_ids,
+        gold_ids,
+        n_condorcet_sims=n_condorcet_sims,
+        n_perms=n_perms,
+        n_boot=n_boot,
+        seed=seed,
+    )
+    return NamedPanelAudit(judge_names=jcols, report=rep)

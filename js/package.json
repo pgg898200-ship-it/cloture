@@ -1,6 +1,6 @@
 {
   "name": "cloture-wasm",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Zero-dependency WebAssembly engine for anytime-valid multi-agent consensus stopping, correlated judge-panel auditing, sequential racing, and Active-PPI++.",
   "type": "module",
   "main": "./cloture.mjs",

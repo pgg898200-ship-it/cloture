@@ -368,3 +368,37 @@ def test_csv_and_jsonl_judge_adapters(tmp_path: Path):
     assert jsonl_audit.judge_names == ["j1", "j2", "j3"]
     assert abs(jsonl_audit.report.n_eff_kish - 1.0) < 1e-6
 
+
+def test_openai_logprobs_and_promptfoo_adapters(tmp_path: Path):
+    fake_resp = {
+        "choices": [
+            {
+                "logprobs": {
+                    "content": [
+                        {
+                            "top_logprobs": [
+                                {"token": "A", "logprob": -0.05},
+                                {"token": "B", "logprob": -3.1},
+                                {"token": "C", "logprob": -4.0},
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+    probs = cloture.extract_openai_logprobs(fake_resp, ["A", "B", "C", "D"])
+    assert len(probs) == 4 and abs(sum(probs) - 1.0) < 1e-9 and probs[0] > 0.90
+
+    pf_rows = []
+    for t in range(30):
+        ok = t < 24
+        for prov in ("openai:gpt-4o", "anthropic:claude", "meta:llama"):
+            pf_rows.append({"testIdx": t, "provider": {"id": prov}, "success": ok})
+    pf_path = tmp_path / "promptfoo.json"
+    pf_path.write_text(json.dumps({"results": {"results": pf_rows}}), encoding="utf-8")
+    pf_audit = cloture.audit_promptfoo(pf_path, n_perms=200, n_condorcet_sims=200, n_boot=100)
+    assert pf_audit.judge_names == ["anthropic:claude", "meta:llama", "openai:gpt-4o"]
+    assert abs(pf_audit.report.n_eff_kish - 1.0) < 1e-6
+
+

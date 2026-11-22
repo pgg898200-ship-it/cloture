@@ -6,7 +6,7 @@ with zero external dependencies.
 """
 from __future__ import annotations
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 _NATIVE_EXPORTS = {
     "AbortCascade",
@@ -44,6 +44,8 @@ _ADAPTER_EXPORTS = {
     "NamedPanelAudit",
     "audit_csv",
     "audit_jsonl",
+    "audit_promptfoo",
+    "extract_openai_logprobs",
 }
 
 __all__ = sorted(_NATIVE_EXPORTS | _ASYNC_EXPORTS | _ADAPTER_EXPORTS | {"__version__"})

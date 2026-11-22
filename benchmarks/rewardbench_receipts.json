@@ -1,0 +1,430 @@
+{
+  "source_dataset": "allenai/reward-bench-results",
+  "source_url": "https://huggingface.co/datasets/allenai/reward-bench-results",
+  "n_items": 2985,
+  "n_strata": 23,
+  "models": [
+    {
+      "name": "GPT-4o (2024-08)",
+      "family": "OpenAI",
+      "file": "eval-set-scores/openai/gpt-4o-2024-08-06.json"
+    },
+    {
+      "name": "GPT-4o (2024-05)",
+      "family": "OpenAI",
+      "file": "eval-set-scores/openai/gpt-4o-2024-05-13.json"
+    },
+    {
+      "name": "GPT-4o-mini",
+      "family": "OpenAI",
+      "file": "eval-set-scores/openai/gpt-4o-mini-2024-07-18.json"
+    },
+    {
+      "name": "Gemini-1.5-Flash",
+      "family": "Google",
+      "file": "eval-set-scores/google/gemini-1.5-flash-001.json"
+    },
+    {
+      "name": "Llama-3.1-405B",
+      "family": "Meta",
+      "file": "eval-set-scores/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo.json"
+    },
+    {
+      "name": "Llama-3.1-70B",
+      "family": "Meta",
+      "file": "eval-set-scores/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo.json"
+    },
+    {
+      "name": "Gemma-2-27B",
+      "family": "Google",
+      "file": "eval-set-scores/google/gemma-2-27b-it.json"
+    },
+    {
+      "name": "Skywork-Gemma-27B-RM",
+      "family": "Skywork",
+      "file": "eval-set-scores/Skywork/Skywork-Reward-Gemma-2-27B-v0.2.json"
+    },
+    {
+      "name": "Skywork-Llama-8B-RM",
+      "family": "Skywork",
+      "file": "eval-set-scores/Skywork/Skywork-Reward-Llama-3.1-8B-v0.2.json"
+    },
+    {
+      "name": "InternLM2-20B-RM",
+      "family": "InternLM",
+      "file": "eval-set-scores/internlm/internlm2-20b-reward.json"
+    },
+    {
+      "name": "Starling-RM-34B",
+      "family": "Nexusflow",
+      "file": "eval-set-scores/Nexusflow/Starling-RM-34B.json"
+    }
+  ],
+  "generative_7_panel": {
+    "judges": [
+      "GPT-4o (2024-08)",
+      "GPT-4o (2024-05)",
+      "GPT-4o-mini",
+      "Gemini-1.5-Flash",
+      "Llama-3.1-405B",
+      "Llama-3.1-70B",
+      "Gemma-2-27B"
+    ],
+    "audit_ms": 67.23,
+    "panel_accuracy": 0.890117,
+    "best_single_judge": "GPT-4o (2024-08)",
+    "best_single_accuracy": 0.886097,
+    "condorcet_predicted_accuracy": 0.936567,
+    "condorcet_gap": 0.046449,
+    "n_eff_kish": 2.2077,
+    "n_eff_kish_ci95": [
+      2.1133,
+      2.3101
+    ],
+    "n_eff_eigen": 2.184,
+    "mean_phi": 0.3618,
+    "mean_within_family_phi": 0.5037,
+    "mean_cross_family_phi": 0.3174,
+    "permutation_p_value": 0.0005,
+    "judge_accuracies": [
+      0.886097,
+      0.867337,
+      0.827471,
+      0.837856,
+      0.831491,
+      0.759799,
+      0.812395
+    ],
+    "loo_delta_acc": [
+      -0.009548,
+      -0.0067,
+      0.001675,
+      -0.003853,
+      -0.009045,
+      -0.00268,
+      -0.00402
+    ],
+    "loo_delta_neff": [
+      0.0111,
+      0.0073,
+      0.0246,
+      -0.1424,
+      -0.1069,
+      -0.1498,
+      -0.128
+    ],
+    "top_correlated_pairs": [
+      {
+        "a": "GPT-4o (2024-08)",
+        "b": "GPT-4o (2024-05)",
+        "same_family": true,
+        "phi": 0.5872
+      },
+      {
+        "a": "GPT-4o (2024-08)",
+        "b": "GPT-4o-mini",
+        "same_family": true,
+        "phi": 0.5396
+      },
+      {
+        "a": "GPT-4o (2024-05)",
+        "b": "GPT-4o-mini",
+        "same_family": true,
+        "phi": 0.5272
+      },
+      {
+        "a": "Llama-3.1-405B",
+        "b": "Llama-3.1-70B",
+        "same_family": true,
+        "phi": 0.4592
+      },
+      {
+        "a": "Gemini-1.5-Flash",
+        "b": "Gemma-2-27B",
+        "same_family": true,
+        "phi": 0.4056
+      },
+      {
+        "a": "GPT-4o-mini",
+        "b": "Gemma-2-27B",
+        "same_family": false,
+        "phi": 0.4051
+      }
+    ],
+    "lowest_correlated_pairs": [
+      {
+        "a": "Gemini-1.5-Flash",
+        "b": "Llama-3.1-405B",
+        "same_family": false,
+        "phi": 0.239
+      },
+      {
+        "a": "Llama-3.1-70B",
+        "b": "Gemma-2-27B",
+        "same_family": false,
+        "phi": 0.2219
+      },
+      {
+        "a": "Gemini-1.5-Flash",
+        "b": "Llama-3.1-70B",
+        "same_family": false,
+        "phi": 0.1888
+      }
+    ]
+  },
+  "frontier_11_pruning": {
+    "full_audit_ms": 47.88,
+    "trajectory": [
+      {
+        "k": 11,
+        "judges": [
+          "GPT-4o (2024-08)",
+          "GPT-4o (2024-05)",
+          "GPT-4o-mini",
+          "Gemini-1.5-Flash",
+          "Llama-3.1-405B",
+          "Llama-3.1-70B",
+          "Gemma-2-27B",
+          "Skywork-Gemma-27B-RM",
+          "Skywork-Llama-8B-RM",
+          "InternLM2-20B-RM",
+          "Starling-RM-34B"
+        ],
+        "panel_accuracy": 0.920268,
+        "best_single_accuracy": 0.949749,
+        "condorcet_predicted_accuracy": 0.971206,
+        "condorcet_gap": 0.050938,
+        "n_eff_kish": 2.7284,
+        "n_eff_eigen": 2.6739,
+        "mean_phi": 0.3032,
+        "permutation_p_value": 0.0005,
+        "cost_savings_pct": 0.0,
+        "next_pruned": "GPT-4o-mini",
+        "next_loo_delta_acc": 0.006365
+      },
+      {
+        "k": 10,
+        "judges": [
+          "GPT-4o (2024-08)",
+          "GPT-4o (2024-05)",
+          "Gemini-1.5-Flash",
+          "Llama-3.1-405B",
+          "Llama-3.1-70B",
+          "Gemma-2-27B",
+          "Skywork-Gemma-27B-RM",
+          "Skywork-Llama-8B-RM",
+          "InternLM2-20B-RM",
+          "Starling-RM-34B"
+        ],
+        "panel_accuracy": 0.926633,
+        "best_single_accuracy": 0.949749,
+        "condorcet_predicted_accuracy": 0.972141,
+        "condorcet_gap": 0.045508,
+        "n_eff_kish": 2.7997,
+        "n_eff_eigen": 2.7632,
+        "mean_phi": 0.2858,
+        "permutation_p_value": 0.0005,
+        "cost_savings_pct": 9.09,
+        "next_pruned": "Gemma-2-27B",
+        "next_loo_delta_acc": 0.00536
+      },
+      {
+        "k": 9,
+        "judges": [
+          "GPT-4o (2024-08)",
+          "GPT-4o (2024-05)",
+          "Gemini-1.5-Flash",
+          "Llama-3.1-405B",
+          "Llama-3.1-70B",
+          "Skywork-Gemma-27B-RM",
+          "Skywork-Llama-8B-RM",
+          "InternLM2-20B-RM",
+          "Starling-RM-34B"
+        ],
+        "panel_accuracy": 0.931993,
+        "best_single_accuracy": 0.949749,
+        "condorcet_predicted_accuracy": 0.975713,
+        "condorcet_gap": 0.04372,
+        "n_eff_kish": 2.7447,
+        "n_eff_eigen": 2.7075,
+        "mean_phi": 0.2849,
+        "permutation_p_value": 0.0005,
+        "cost_savings_pct": 18.18,
+        "next_pruned": "GPT-4o (2024-05)",
+        "next_loo_delta_acc": 0.002345
+      },
+      {
+        "k": 8,
+        "judges": [
+          "GPT-4o (2024-08)",
+          "Gemini-1.5-Flash",
+          "Llama-3.1-405B",
+          "Llama-3.1-70B",
+          "Skywork-Gemma-27B-RM",
+          "Skywork-Llama-8B-RM",
+          "InternLM2-20B-RM",
+          "Starling-RM-34B"
+        ],
+        "panel_accuracy": 0.934338,
+        "best_single_accuracy": 0.949749,
+        "condorcet_predicted_accuracy": 0.972362,
+        "condorcet_gap": 0.038024,
+        "n_eff_kish": 2.7879,
+        "n_eff_eigen": 2.7697,
+        "mean_phi": 0.2671,
+        "permutation_p_value": 0.0005,
+        "cost_savings_pct": 27.27,
+        "next_pruned": "Llama-3.1-70B",
+        "next_loo_delta_acc": 0.008375
+      },
+      {
+        "k": 7,
+        "judges": [
+          "GPT-4o (2024-08)",
+          "Gemini-1.5-Flash",
+          "Llama-3.1-405B",
+          "Skywork-Gemma-27B-RM",
+          "Skywork-Llama-8B-RM",
+          "InternLM2-20B-RM",
+          "Starling-RM-34B"
+        ],
+        "panel_accuracy": 0.942714,
+        "best_single_accuracy": 0.949749,
+        "condorcet_predicted_accuracy": 0.978558,
+        "condorcet_gap": 0.035845,
+        "n_eff_kish": 2.6442,
+        "n_eff_eigen": 2.6288,
+        "mean_phi": 0.2746,
+        "permutation_p_value": 0.0005,
+        "cost_savings_pct": 36.36,
+        "next_pruned": "Starling-RM-34B",
+        "next_loo_delta_acc": -0.001005
+      },
+      {
+        "k": 6,
+        "judges": [
+          "GPT-4o (2024-08)",
+          "Gemini-1.5-Flash",
+          "Llama-3.1-405B",
+          "Skywork-Gemma-27B-RM",
+          "Skywork-Llama-8B-RM",
+          "InternLM2-20B-RM"
+        ],
+        "panel_accuracy": 0.941709,
+        "best_single_accuracy": 0.949749,
+        "condorcet_predicted_accuracy": 0.977081,
+        "condorcet_gap": 0.035372,
+        "n_eff_kish": 2.6083,
+        "n_eff_eigen": 2.6005,
+        "mean_phi": 0.2601,
+        "permutation_p_value": 0.0005,
+        "cost_savings_pct": 45.45,
+        "next_pruned": "Gemini-1.5-Flash",
+        "next_loo_delta_acc": 0.009045
+      },
+      {
+        "k": 5,
+        "judges": [
+          "GPT-4o (2024-08)",
+          "Llama-3.1-405B",
+          "Skywork-Gemma-27B-RM",
+          "Skywork-Llama-8B-RM",
+          "InternLM2-20B-RM"
+        ],
+        "panel_accuracy": 0.950754,
+        "best_single_accuracy": 0.949749,
+        "condorcet_predicted_accuracy": 0.983255,
+        "condorcet_gap": 0.032501,
+        "n_eff_kish": 2.4749,
+        "n_eff_eigen": 2.4697,
+        "mean_phi": 0.2551,
+        "permutation_p_value": 0.0005,
+        "cost_savings_pct": 54.55,
+        "next_pruned": "Llama-3.1-405B",
+        "next_loo_delta_acc": 0.000335
+      },
+      {
+        "k": 4,
+        "judges": [
+          "GPT-4o (2024-08)",
+          "Skywork-Gemma-27B-RM",
+          "Skywork-Llama-8B-RM",
+          "InternLM2-20B-RM"
+        ],
+        "panel_accuracy": 0.951089,
+        "best_single_accuracy": 0.949749,
+        "condorcet_predicted_accuracy": 0.975152,
+        "condorcet_gap": 0.024064,
+        "n_eff_kish": 2.1904,
+        "n_eff_eigen": 2.187,
+        "mean_phi": 0.2754,
+        "permutation_p_value": 0.0005,
+        "cost_savings_pct": 63.64,
+        "next_pruned": "InternLM2-20B-RM",
+        "next_loo_delta_acc": 0.007705
+      },
+      {
+        "k": 3,
+        "judges": [
+          "GPT-4o (2024-08)",
+          "Skywork-Gemma-27B-RM",
+          "Skywork-Llama-8B-RM"
+        ],
+        "panel_accuracy": 0.958794,
+        "best_single_accuracy": 0.949749,
+        "condorcet_predicted_accuracy": 0.979622,
+        "condorcet_gap": 0.020828,
+        "n_eff_kish": 1.9458,
+        "n_eff_eigen": 1.9304,
+        "mean_phi": 0.2709,
+        "permutation_p_value": 0.0005,
+        "cost_savings_pct": 72.73,
+        "next_pruned": null,
+        "next_loo_delta_acc": null
+      }
+    ],
+    "summary": {
+      "start_k": 11,
+      "start_acc": 0.920268,
+      "start_neff_kish": 2.7284,
+      "end_k": 3,
+      "end_judges": [
+        "GPT-4o (2024-08)",
+        "Skywork-Gemma-27B-RM",
+        "Skywork-Llama-8B-RM"
+      ],
+      "end_acc": 0.958794,
+      "accuracy_gain_pp": 3.85,
+      "gain_over_best_single_pp": 0.9,
+      "cost_savings_pct": 72.73
+    }
+  },
+  "paired_agent_race_6_models": {
+    "models": [
+      "GPT-4o (2024-08)",
+      "Gemini-1.5-Flash",
+      "Llama-3.1-405B",
+      "Gemma-2-27B",
+      "Llama-3.1-70B",
+      "GPT-4o-mini"
+    ],
+    "n_shuffled_trials": 50,
+    "full_evals": 17910,
+    "mean_evals": 3513.3,
+    "pct_evals_saved": 80.38,
+    "certified_true_winner_rate": 1.0,
+    "wrong_winner_rate": 0.0
+  },
+  "active_ppi_gpt4o_mini_to_gpt4o": {
+    "n_trials": 50,
+    "audit_rate": 0.1,
+    "true_gpt4o_accuracy": 0.886097,
+    "naive_gpt4o_mini_proxy_mean": 0.761977,
+    "naive_bias_pp": -12.41,
+    "anytime_coverage_all_2985_steps": 1.0,
+    "mean_final_width": 0.1539,
+    "mean_variance_reduction": 10.46,
+    "mean_n_audited": 298.0
+  },
+  "playground_preset_b64": "///39////f///////////////////9/////////////ff77/////5e////+f///3//////////////////////////////9//+//////////////f////////////f3v/////7/1//33///f/////////fz//3////////f/////f///3////7///f////////5/v/////////////////3/f///3//+/////+l/+P////7/////7////9/////v///////////+/78/4u///////////////9//////9//////vi/3//yfy//P4//////f/////7//////7/////7//////f///3/////9b4f/fm3z/+//9v///5df7///X/P97///vd9/73/9/9r7/f8D9//////////7/P/7///+/+f3////////73///9v/////////v/z/sv/////8/cLf/v//3////3/9/t/////9//+8r//aA+///////////+/7////////t7/3/3/////7///////////////////9///////////////////////////////+////9////////+//////+///f////3//f/7////9///s////3v///////////v/7///////f7gOf///9//X/f9XL9T1z/zf3///99/7///v8HW9f3/r3+3///vf/7f7z/////v5+ff/f//+Ph//9vf+x+9/v///6Ijv3///////////7//z9wvv//2P////+///////3////7v/v/////7e//f7JZ/v/////9//9/tv///+r////b///e3///////////b/s3///3///9//////////8fT+/7P//////n/3+YuP/////////9v///HSJu8/c7/v3vJxgA/Q9Aswvc/W///cD9/3SE24RwAJCY2wEIdreH2f+xBLj/AwY7gEHc/33//8ADDmrx/N7xMfW5/wNGc4ATmO5en7jff+883/t+/35/uMF9bjP/r9/sYJe4+eXue4tDjP6Tden//x4QlA1MQAESGcDcf3uA+R9yoIO4/f0HMAD5PkDSB5n/QwYwiIvt/2ePH8In77+7BwxioA8ASPjv+zcDD2AAhBjZwXa2/4/dfxJyl/sDLhi3AwxgQAcagN3/trMD3v9Gg7j9AQYxiEHM/+/3/f7CDzCA+f9uAAeI///+/v/7/2D+/7/5GOZ+37/dYzC329//Z/77ee79/3+7/z1/Ev+/32P+/7/f3ef/g/3/7b53qYD0NjH3/////vf///+fcbu7//8//3nA/Q4Q/98/53+//79PpnW4+/9+/x+A2///f6j///+B8u/f//v/u73xveP/+////x//R+2/7h953Ebg9v9H8+3///nB+F9y/9/f7qe3v8H9H1h/+fX/swWA++n//7PfHxT/t/+tTer/oRMJ/DP/PwT9f3fZ+/7/YbF5APx/1sxH3IQA9P/////5/9/u//+/Xf13//nvf////6++53+//88HAGLe//3/////yLs99v///v8///v/z25inv/d/z//+f////ff////9x8zz////7////8///8Iev73////528H//tXzP5z0/33/x8QkF/G/6Hwf+T8///Xf///n////3//+Yn7v+b+///n///5/////5///f8///nPf/7////+/3///e///n+f//3nv/f773//+////P+////+f/////9e/Tv/+c9///P///3nZur//3/++9///ec////f///+/v//17//+f///vOf//7/P///78f98//f/e////3fz/z7n/v/73///d9//v/f///3/5f+7/8/JP7//+j/////f///f////////////f9P9v///3/2/////0n7///f7Pnv///zub/8/z///c9//vPff/3nP//5z9//+/9///j///+v//n/C//y3///4vf/////z67/////3zv//////Pk8//3v///zv////z//+c9//vPf//zvT/79/3//+3///9H9/+5/////7/v/+/////8/2X/////////////7/////Pc///nP3//7n//85wPg//9///Pf///nP//973/+////l+//////f8P7//9/m/z/9mj7/vfv9PX///2N////+9///O////n////1///85z///YB6//Pf///nP//5z3/+8////+//////v+3/////1////9//////////f////////7///Oc///3P//7zn//853//+e////Pf//zlv//5v///7P+//f//n+f/P8n/+3/3/9+/7/dPxP/////////+////+RH/f9X9////L/v9//7//5/9//r///8Bcv//////v/////f//ff/////B9D////////////////////f////////n/7/3/9/////////n//8/z8f0YN+/uOfP3RBb/L//3/3////////////////v//9/////////////////////////7/7////////////////////+///9v////9//////3/++//////////////7//////////9///P////n///5/98/IAADAAAAAHGIAcx0EQ+AyQME+P/f/v+BgSwAfX9Z+n/+4ZDw//8/HyDPf+//+U+oPwJgmdsCwPzhl/zsZx8A/////yc3v/8r4H/Ykd3s9p+Y/0cfVoC9fTYkgbnt////+/80AP6vHED9H//RAxwg9r//7f9/+/vf////////Jx+b9oXt/sUPGP0iB7Lf////A51x/AEAABi5/f///3/+/////9///7//3f//H3Pb+////x+B8AH+/3/+/////////////////////////37///9//////////9//////////////////Tb7/////7/90j+7t//////////f////////7///////f/f////+///v///6/////3////5f7////////f//2////73///8v9////3998/7//3///////3ff/////3///3////3e++//b/+///93//8////////////f+/////+j/v////3//+////////v7////////n////wfd3v/v/7/67//////+/+///9///////vv////////////////v//////////z///////////////////3//+/9/3P/+////n//////+///fY9T/////////P//5//////+/3////+nL3/7/3///r7///d///3ff///vf3/5//////ff/P9n//+/////33/d/7//3/3P/vv////3//v/3//+//+/9ez////////+///O/3///f/t/v////5/////7///////f77/f6/////2v/////9///9////f///u/v//Gfx/9///P+3/////f///7/////70////////////////////+////////////f//////v///u/v9/////9//////3////////u7////////////f//////9///////7/////2/3////+/+2////////////9v//7/////vb/////v3//3//////7//7///9fff/3/7/////++/t///+//97/vv///33s//cS0O//////I/33/////6f//////////r9d/////0Pk/xP+/v9//f///////////z/////f/vvf////f///2/N/bv////////////////8/3v7//9v//////////////////////ff///3u//////////////////v/////////79/v+///////P9PO/v7///////9/+///7v//////////+/3///////////////P+///+7///+f/////3//3/f//7///+////0f/////73/+////97/////v//v//v9nv//9//3//9v////7+//////7/l///////29///v///38t7///7///t/////3////////+///9/////2/8//f////v7/v//+////v//v/+f//pT/7/////9///////////////7//7//3//tf//7///7//////////9/7/+/jP8v/////////////v//P/+f/+///////3///9//9///////9x/v//7///3v3//7///b3+////3+539v///7+/////5/6////v////Xf3//9O/+43///////9/v///7////9dt/f+3BuL////7/3zu/7f7///v//7//////793s+77///P7f//////bv//////96n/2/9//7fb1f///9///7///9v3vsb////////////+////f+7/////////////////////////////7///9v/7/////f//////////////////////+P///////3/T///////////////////////f//////////////3//3/////5/v////9/39//////17/9/2f2//vf////P9//v////8////////ff/////f/////957//f1/9//e/////Z/7/7/1/////////////////////7v47+f///+e////v///v////9///P+//+////P/3n/++///////////7+//v///v7+/+//v////9/33AvR/06/t+/////f9/7v+nB/3/t9f///v+//8X/v/1B/r/2x94/////78Pj//////7//7//f/+/3///98/3f///3/0/f//v+//r/2f//+fHnT9+//+/+/90f///+/Xzf///////////b///v7//f//H/n/////77/55X/+//qX/f/133/53f/x///9//9/e/P/3/yr3//n3///xCv////rv/b63/v8f+/99/8/snP///9X///I3z/vt/f//z////37////D/j/oRr7/5+88qE/vO9X//v9////ry+/+T+f/afvf///v/zq/1930x9O//dHu/3///+/////zQ/4/+////u//+u79X3+/7/3+P8/6/T3/v/vv///R7xyBP9//PX//90v/f75D7jv//9//28+4P/////rD/n//3//+9///P+/eer/f//f//z/6/9/qv///7/3f/38//7t77/gm//9//+++P9f3///K3j4I++++U8u+P5Pu////v/Y93////89/f3/fd3/////////U///////5//f/PPzt//9///y/99/8l/T+dW//f//d2nM///73/v//n/7//zc7/+A75/3Af9//v7/987///Z9L3vP///7v3f8/5n//9z////Hv3z/v8/7/wMvcf//f+D73/3/i8/02f99/93//+97///7vz79/f946u4/////3f+Z/7///////d+f6LW/vf8TqrODQ87/gYte3///98YTvvJ+B17s/B/5z1+87vP1f+R/vv3/R739Ow/93zvn/f/////5v//3f//3/z884cv///f//7+BBg=="
+}

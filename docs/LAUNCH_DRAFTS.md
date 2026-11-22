@@ -1,13 +1,13 @@
-# Organic Launch Drafts (`cloture v0.1.0`)
+# Organic Launch Drafts (`cloture v0.2.0`)
 
-Authentic, empirical-first drafts designed for technical developer communities. Every number links directly to `benchmarks/results.json` and is reproducible locally with `cloture bench` or `benchmarks/run_benchmarks.py`.
+Authentic, empirical-first drafts designed for technical developer communities. Every number links directly to `benchmarks/results.json` and `benchmarks/rewardbench_receipts.json` and is reproducible locally with `cloture bench`, `benchmarks/run_benchmarks.py`, or in-browser via the `243 KB` WASM playground.
 
 ---
 
 ## 1. Show HN
 
 **Title:**
-`Show HN: Cloture – Zero-dep Rust engine to stop multi-agent debates when math proves a winner`
+`Show HN: Cloture – Zero-dep Rust/WASM engine for anytime-valid multi-agent stopping & judge auditing`
 
 **URL:**
 `https://github.com/pgg898200-ship-it/cloture`
@@ -18,23 +18,25 @@ Hi HN,
 
 I built `cloture` after watching multi-agent Best-of-N loops and LLM-as-a-judge panels waste 60%–90% of API spend while quietly violating their own error rates.
 
-Two concrete findings drove the design:
+Two concrete empirical results drove v0.2.0:
 
-1. Fixed-N self-consistency wastes most calls on easy prompts, while naive early stopping ("stop when 5 agree" or peeking at p < 0.05) blows up tie-null false certifications to 28.5%–53.8%. Using finite-sample anytime-valid e-processes (grey-box ASC-D over logprobs or category-agnostic CITE over arbitrary outputs), `cloture` stops easy prompts in 21 calls (67% saved vs. Fixed-64, 92% vs. Fixed-256) with 0.0%–0.5% tie-null FPR.
+1. On 2,985 real human-verified items from AllenAI RewardBench across 11 frontier models (GPT-4o, GPT-4o-mini, Gemini-1.5-Flash, Llama-3.1-405B/70B, Gemma-2-27B, and top reward models), a 7-model generative judge panel collapses to n_eff = 2.21 effective independent votes (within-family phi 0.504 vs. cross-family 0.317, +4.65 pp Condorcet gap, p = 0.00050). Greedy Leave-One-Out pruning from 11 judges down to 3 *raised* panel accuracy +3.85 pp (92.03% -> 95.88%, beating the best single model by +0.90 pp) while cutting judge API calls 72.7%. You can inspect that exact 2,985-item panel—or paste your own CSV privately—inside our 243 KB zero-import browser WASM playground: https://pgg898200-ship-it.github.io/cloture/playground.html
 
-2. Correlated LLM-as-a-judge panels break Condorcet's jury theorem. On a realistic 9-judge correlated error panel, Kish effective sample size is 2.21 effective votes (20.4 pp below the independence prediction). Leave-one-out pruning showed dropping the 2 most redundant judges *increased* panel accuracy by +2.72 pp while cutting judge API cost 22.2%.
+2. Fixed-N self-consistency wastes most calls on easy prompts, while naive early stopping ("stop when 5 agree" or peeking at p < 0.05) blows up tie-null false certifications to 28.5%–53.8%. Using finite-sample anytime-valid e-processes (grey-box ASC-D over logprobs at 668 ns/update, or category-agnostic CITE at 210 ns/update), `cloture` stops easy prompts in 21 calls (67% saved vs. Fixed-64, 92% vs. Fixed-256) with 0.0%–0.5% tie-null FPR.
 
 Technical choices:
-- Zero external Rust crates (`Cargo.lock` is 15 lines; `std` only) and zero Python runtime dependencies (`import cloture` takes 26.5 ms via ctypes to `libcloture_core`).
-- Single 2.47 MiB static binary (`cloture`) with stdin pipelines (`stop`, `audit`, `race`, `ppi`), a built-in CPU microbenchmark (`cloture bench`), and a stdio JSON-RPC 2.0 MCP server (`cloture mcp`, 76.7 µs median roundtrip).
-- Also ships `PopulationCert` (preventing 33%–40% false fires from pooled correlated rollouts), `AgentRace` (paired e-process racing, 11,112x faster than `bayesbench.BayesianRanker`), online affine `ActivePPI` (99% anytime coverage even under biased or adversarially inverted judges), `SafeFuse` poisoning quarantine, `OnlineConformal` (64.5 ns Rust AgACI, 2,930x faster than `online-cp`), and a 712-byte associative/commutative wire monoid (`EvidenceSketch`).
-- 266/266 tests including 203 adversarial statistical, FFI, and fuzzing tests (which caught 10 real bugs before v0.1.0, including a 96% skewed-null FPR bug in our first SafeFuse draft).
+- Zero external Rust crates (`Cargo.lock` is 15 lines; `std` only), zero Python runtime dependencies (`pip install cloture`, `import cloture` takes 24.8 ms via universal `py3-none` ctypes wheels), and zero WASM host imports (`243 KB` raw / `81 KB` gzipped).
+- Single 2.91 MiB static CLI binary (`cloture audit --csv judges.csv`, `stop`, `race`, `ppi`, `bench`) + stdio JSON-RPC 2.0 MCP server (`cloture mcp`, 67.6 µs median roundtrip).
+- v0.2.0 speedups vs. installed PyPI libraries:
+  - PanelAudit (9x1,000, 2k perms / 2k MC / 1k boot): 26.0 ms vs. NumPy/SciPy 1.45 s (55.7x faster, 2.66e-15 max diff)
+  - EmpiricalBernsteinCS (100k batch): 16.0 ns/step (25.7x faster than `confseq`, 1.10x faster than `expectation` on single-call batch and 297x faster in Python 1-step streaming)
+  - BettingCS (G=201): 281 ns Rust / 330 ns Py batch (415x faster & tighter than `confseq.hedged_cs` 137 µs)
+  - AscdStopper (K=4): 668 ns/update (85.5x faster than NumPy, 25/25 exact stop parity)
+  - AgentRace (6 arms, paired): 2.60 ms vs. `bayesbench.BayesianRanker` 29.3 s (11,276x faster; saves 80.4% of evals on 50/50 shuffled RewardBench runs)
+  - OnlineConformal (4-rate AgACI): 59.7 ns Rust (3,294x faster than `online-cp` SimpleJumper; 94.4% post-shift recovery)
+- 282/282 tests including 203 adversarial statistical, FFI, and fuzzing tests.
 
-Honest caveats (documented in README & docs/comparisons.md):
-- If you never peek sequentially and only compute one fixed-horizon PPI interval at the end of a static dataset, `ppi-python` yields tighter asymptotic intervals (0.054 vs. 0.146).
-- If you only run one single-call offline Empirical-Bernstein check over a static 100k array, `expectation` is faster in that single batch call (22.8 ns vs. 110 ns), while `cloture` is 219x faster for 1-step streaming in Python.
-
-Raw benchmark JSON receipts are checked into `benchmarks/results.json`. Happy to discuss the martingale proofs, FFI hardening, or correlated-rollout pitfalls!
+Honest caveat: if you have a static dataset and strictly commit never to peek sequentially, `ppi-python` produces tighter fixed-horizon asymptotic intervals (0.054 vs. 0.146). Raw JSON receipts are in `benchmarks/results.json` and `benchmarks/rewardbench_receipts.json`.
 ```
 
 ---
@@ -42,23 +44,24 @@ Raw benchmark JSON receipts are checked into `benchmarks/results.json`. Happy to
 ## 2. r/LocalLLaMA & r/MachineLearning
 
 **Title:**
-`We measured correlated LLM-as-a-judge collapse (9 judges = 2.2 effective votes) and built cloture: a zero-dependency Rust/Python anytime-valid stopping & eval engine`
+`We audited 11 frontier LLM judges on 2,985 AllenAI RewardBench items: pruning 11 -> 3 raised accuracy +3.85 pp at -72.7% cost (zero-dep Rust/Python/WASM tool)`
 
 **Body:**
 ```
-If you run Best-of-N self-consistency, multi-agent debates, LLM-as-a-judge panels, or continuous prompt/model evals, we built an MIT-licensed, zero-dependency Rust core + Python SDK (`pip install cloture`) + 2.47 MiB CLI/MCP server:
+If you run Best-of-N self-consistency, multi-agent debates, LLM-as-a-judge panels, or continuous prompt/model evals, we just shipped `cloture v0.2.0` (MIT): a zero-dependency Rust core + Python SDK (`pip install cloture`) + 2.91 MiB static CLI/MCP server + 243 KB zero-import browser WASM playground:
 
-https://github.com/pgg898200-ship-it/cloture
+- GitHub: https://github.com/pgg898200-ship-it/cloture
+- Live Browser WASM Playground (1-click real RewardBench dataset or paste your own CSV locally): https://pgg898200-ship-it.github.io/cloture/playground.html
 
-Highlights from our reproducible 7-suite benchmark (`benchmarks/results.json`) against `confseq`, `ppi-python`, `expectation`, `online-cp`, `bayesbench`, and NumPy/SciPy:
+Highlights from real AllenAI RewardBench (2,985 items, 23 strata, 11 frontier models) and our 7-suite benchmark (`benchmarks/results.json`):
 
-- **Consensus early stopping (`AscdStopper` / `CiteStopper`):** 67%–92% fewer calls on easy prompts with 0.0%–0.5% tie-null false certifications (vs. 28.5%–30.5% for naive p < 0.05 peeking). Async `await cloture.consensus(...)` cancels remaining in-flight LLM requests the millisecond consensus is certified.
-- **Judge panel audit (`audit_panel`):** On a 9-judge x 1,000-item panel, detects Kish `n_eff = 2.21` (20.4 pp Condorcet gap) in 317.7 ms (4.8x faster than vectorized NumPy/SciPy, 2.66e-15 max diff). Dropping the 2 most correlated judges raised accuracy +2.72 pp at -22.2% judge cost.
-- **Correlated rollouts (`PopulationCert`):** Pooling 16 correlated rollouts/prompt across 30 prompts causes 33%–40% false-positive eval gates at alpha=0.05. `PopulationCert` holds 0.7% null FPR and computes optimal rollouts-per-prompt allocation (`30x16 -> 120x4` raises power from 27.3% to 88.0% at the same token budget).
-- **Active-PPI++ (`ActivePPI`):** 99.0% anytime coverage with 10% human audits (6.29x variance reduction on +0.15 biased judges; auto-collapses `lambda -> 0` on adversarially inverted judges), while `ppi-python` drops to 71.0% coverage under sequential peeking.
-- **Zero deps everywhere:** 0 external Rust crates (15-line `Cargo.lock`), 0 Python runtime dependencies (`26.5 ms` cold import vs. `2.1 s` for `ppi_py`).
+- **Correlated judge collapse (`cloture audit --csv judges.csv` / `cloture.audit_csv` / `audit_promptfoo`):** Across 7 generative frontier LLMs (GPT-4o x2, GPT-4o-mini, Gemini-1.5-Flash, Llama-3.1-405B/70B, Gemma-2-27B), Kish `n_eff = 2.21 / 7` (within-family phi 0.504 vs. cross-family 0.317; audited in 67.2 ms). Greedy LOO pruning from 11 judges down to 3 lifted accuracy **+3.85 pp (92.03% -> 95.88%)** — beating the best single model by +0.90 pp — at **-72.7% API cost**. Runs 55.7x faster than vectorized NumPy/SciPy (26.0 ms vs. 1.45 s for 9x1,000, 2.66e-15 max diff).
+- **Consensus early stopping (`AscdStopper` / `CiteStopper`):** 67%–92% fewer calls on easy prompts with 0.0%–0.5% tie-null false certifications (vs. 28.5%–30.5% for naive peeking). `await cloture.consensus(...)` cancels remaining in-flight API requests the millisecond consensus is certified (`668 ns/update`, 85.5x faster than NumPy).
+- **Sequential racing (`AgentRace`):** Certifies the true RewardBench winner on 50/50 shuffled runs while saving **80.4%** of evals (11,276x faster than `bayesbench.BayesianRanker`).
+- **Active-PPI++ (`ActivePPI`):** On real RewardBench (`GPT-4o-mini` proxy -> `GPT-4o`, 10% audit), delivers **100% anytime coverage** across all 2,985 steps with **10.46x variance reduction**, eliminating -12.41 pp proxy bias (and auto-collapses `lambda -> 0` on adversarially inverted judges), while `ppi-python` drops to 71.0% under sequential peeking.
+- **Zero deps everywhere:** 0 external Rust crates (15-line `Cargo.lock`), 0 Python runtime deps (`24.8 ms` cold import vs. `2.07 s` for `ppi_py`).
 
-We also clearly list where `ppi-python` (single fixed-horizon no-peeking) and `expectation` (single offline batch) are tighter/faster in `docs/comparisons.md`. Feedback and real-world judge-panel traces very welcome!
+Feedback and real-world judge CSVs very welcome!
 ```
 
 ---
@@ -66,22 +69,24 @@ We also clearly list where `ppi-python` (single fixed-horizon no-peeking) and `e
 ## 3. r/rust
 
 **Title:**
-`cloture v0.1.0: Zero-crate Rust engine (15-line Cargo.lock) for sub-microsecond anytime-valid multi-agent stopping, panel auditing, and 712B wire monoids`
+`cloture v0.2.0: Zero-crate Rust + 243 KB zero-import WASM engine (16 ns EB-CS, 281 ns BettingCS, 26 ms parallel panel audit)`
 
 **Body:**
 ```
-I just released `cloture v0.1.0` (MIT): a zero-external-dependency Rust workspace (`cloture-core` + `cloture-cli`) for sequential statistical certification in live multi-agent AI stacks.
+I just released `cloture v0.2.0` (MIT): a strictly `std`-only Rust workspace (`cloture-core` + `cloture-cli`) for sequential statistical certification in live multi-agent AI stacks.
 
 Repo: https://github.com/pgg898200-ship-it/cloture
+Live 243 KB zero-import WASM playground: https://pgg898200-ship-it.github.io/cloture/playground.html
 
-Rust engineering details that might interest r/rust:
-- **Strictly `std`-only:** `Cargo.lock` has 2 entries (`cloture-core`, `cloture-cli`). Built-in RFC 8259 JSON parser/serializer (depth-capped at 128, rejects non-finite numbers and fractional `u64` truncation), Jacobi symmetric eigensolver, deterministic SplitMix64/Xoshiro256++ PRNG, and stdio JSON-RPC 2.0 MCP server — all in ~11k LOC compiling in ~18s to a 2.47 MiB binary.
-- **Hardened C ABI (`include/cloture.h`) + universal Python wheels:** Uses `panic = "unwind"` with `std::panic::catch_unwind` at every `extern "C"` boundary (learned the hard way when our adversarial breaker suite showed `panic = "abort"` nullifies `catch_unwind`!). Because Python loads `libcloture_core` via `ctypes`, 5 `py3-none-<platform>` wheels cover Python 3.9–3.14+ with zero CPython ABI coupling.
-- **Zero-transcendental Fan-inequality supermartingale (`SafeFuse`):** Replaced `ln_1p` betting with unclamped `lam * x - psi_E(lam) * x^2`, fixing a skewed-null FPR bug from 96.3% -> 0.0–0.75% while speeding up `SafeFuse(K=5)::update` 1.6x to 1.24 µs.
-- **712-byte associative/commutative wire monoid (`EvidenceSketch`):** Fixed binary layout (`b"CLTR"` + FNV-1a 64-bit checksum), 76.3 ns merge, 0.0 exact error across 1,000-worker fleet merges and Leave-One-Out subtraction.
-- **Microbenchmarks:** `EmpiricalBernsteinCS` 88.9 ns/step, `OnlineConformal` (4-rate AgACI) 64.5 ns/step, `cloture mcp` 76.7 µs roundtrip. Run `cloture bench` to verify on your CPU.
-
-Curious to hear feedback on the FFI surface, no-std feasibility for `cloture-core`, and SIMD vectorization opportunities!
+Rust systems engineering highlights from v0.2.0:
+- **Zero external crates (`15`-line `Cargo.lock`):** Built-in RFC-8259 JSON parser, RFC-4180 CSV parser (`cloture audit --csv`), Jacobi symmetric eigensolver, deterministic SplitMix64/Xoshiro256++ PRNG, zero-import `wasm32-unknown-unknown` target (`243 KB` raw / `81 KB` gzipped, `IMPORTS: []`), and stdio JSON-RPC 2.0 MCP server (`67.6 µs` roundtrip).
+- **Zero-libm IEEE-754 transcendental kernels (`math.rs`):** Tiered SSE2 Chebyshev `fast_ln` / `fast_ln_1p` / `add_bet_grid_pair` + exact active-cell pruning in `BettingCS(G=201)` (bit-for-bit identical to unpruned grid):
+  - `EmpiricalBernsteinCS`: **16.0 ns/step** batch-100k (25.7x faster than `confseq` C++, 1.10x faster than `expectation` Rust on single-call batch, 297x faster in Py streaming)
+  - `BettingCS(G=201)`: **281 ns** Rust / **330 ns** Py batch (**415x** faster than `confseq.hedged_cs`)
+  - `AscdStopper(K=4)`: **668 ns** batch (**85.5x** faster than NumPy, 25/25 exact stop parity)
+- **Zero-dep parallel `PanelAudit` (`std::thread::scope` + exact O(K²) Poisson-Binomial DP):** Cut `9 x 1,000` (2k perms / 2k MC / 1k boot) from 318 ms -> **26.0 ms** (**55.7x** faster than NumPy/SciPy, `2.66e-15` max diff; 14.7 ms on binary panels).
+- **Hardened C ABI (`panic = "unwind"` + `catch_unwind`)** powering 5 universal `py3-none` wheels covering Python 3.9–3.14+ with zero CPython ABI coupling.
+- **282/282 tests** (68 Rust + 213 Python/CLI/MCP/adversarial breaker + Node.js WASM). Run `cloture bench` to verify on your CPU!
 ```
 
 ---
@@ -90,48 +95,50 @@ Curious to hear feedback on the FFI surface, no-std feasibility for `cloture-cor
 
 **1/5:**
 ```
-Multi-agent Best-of-N loops waste 67%–92% of LLM calls on easy prompts — and naive "stop when 5 agree" peeking blows up false certifications to 28%–54%.
+We audited 11 frontier LLM judges on 2,985 real AllenAI RewardBench items.
 
-And 9 frontier LLM-as-a-judge models often deliver only 2.2 effective independent votes.
+7 generative LLMs collapsed to 2.21 effective independent votes.
 
-Meet `cloture`: a zero-dep Rust + Python engine that ends the debate the millisecond the math proves who won.
+Pruning 11 judges down to 3 *raised* accuracy +3.85 pp (92.0% -> 95.9%, beating the best single model) while cutting API cost 72.7%.
 
+Meet `cloture v0.2.0` (MIT):
 https://github.com/pgg898200-ship-it/cloture
 ```
 
 **2/5:**
 ```
-1) Anytime-valid consensus stopping (`AscdStopper` / `CiteStopper`):
-- Easy prompts: 21 calls instead of 64 (67% saved) or 256 (92% saved), 100% accuracy
-- Exact-tie null: 0.0%–0.5% false cert vs. 28.5%–30.5% naive peeking
-- `await cloture.consensus(...)` cancels remaining in-flight API calls the instant the winner is certified
+Try it on that exact 2,985-item RewardBench panel — or paste your own judge CSV privately — inside a 243 KB zero-import Rust WebAssembly playground (zero backend, zero upload):
+
+https://pgg898200-ship-it.github.io/cloture/playground.html
+
+Or locally in 1 line:
+  cloture audit --csv judges.csv --gold-col gold
 ```
 
 **3/5:**
 ```
-2) Correlated LLM-as-a-judge panel audit (`cloture audit`):
-On a 9-judge x 1,000-item panel:
-- 9 judges -> 2.21 effective independent votes (20.4 pp Condorcet gap)
-- Runs in 317.7 ms (4.8x faster than NumPy/SciPy, 2.66e-15 max diff)
-- Dropping the 2 most correlated judges *raised* accuracy +2.72 pp while cutting judge API cost 22.2%
+And for Best-of-N / multi-agent debates (`AscdStopper` / `CiteStopper`):
+- Easy prompts stop in 21 calls instead of 64 (67% saved) or 256 (92% saved), 100% accuracy
+- Exact-tie null: 0.0%–0.5% false cert vs. 28.5%–30.5% naive peeking
+- `await cloture.consensus(...)` cancels in-flight API calls the millisecond math certifies a winner
 ```
 
 **4/5:**
 ```
-3) Built for production systems, not notebooks:
-- 0 external Rust crates (15-line Cargo.lock)
-- 0 Python runtime deps (`import cloture` in 26.5 ms vs. 2.1s for `ppi_py`)
-- Single 2.47 MiB static binary + native JSON-RPC 2.0 MCP server (`cloture mcp`, 76.7 µs)
-- 11,112x faster paired agent racing than `bayesbench`, 2,930x faster online conformal than `online-cp`
+v0.2.0 zero-dependency Rust engine speedups vs. installed PyPI packages:
+- PanelAudit (9x1,000): 26.0 ms (55.7x vs NumPy/SciPy)
+- BettingCS (G=201): 330 ns (415x vs confseq)
+- EB-CS (100k batch): 16.0 ns (25.7x vs confseq, 297x Py stream vs expectation)
+- AgentRace (6-arm): 2.60 ms (11,276x vs bayesbench)
+- OnlineConformal: 59.7 ns (3,294x vs online-cp)
 ```
 
 **5/5:**
 ```
-Every number is backed by raw machine-verifiable receipts (`benchmarks/results.json`), 266/266 tests (203 adversarial statistical + FFI breaker tests), and honest caveats on when fixed-horizon tools win.
+0 external Rust crates (15-line Cargo.lock), 0 Python runtime deps (24.8 ms cold import), 2.91 MiB static CLI + 67.6 µs MCP server, 282/282 tests, raw JSON receipts checked into the repo.
 
-Try it in 10 seconds:
+Try in 10 seconds:
   pip install cloture
-  # or
   claude mcp add cloture -- cloture mcp
 
 MIT licensed.
@@ -143,4 +150,4 @@ MIT licensed.
 
 - **Registry manifest:** `server.json` (`io.github.pgg898200-ship-it/cloture`)
 - **One-line summary:**
-  `cloture` — Zero-dependency Rust MCP server (`2.47 MiB`, `76.7 µs` roundtrip) giving AI agents 6 anytime-valid statistical tools: multi-agent consensus stopping (`ASC-D`/`CITE`), correlated judge-panel `n_eff` auditing, clustered rollout population certification, sequential agent racing, `Active-PPI++`, and poisoning-resistant `SafeFuse` aggregation.
+  `cloture` — Zero-dependency Rust MCP server (`2.91 MiB`, `67.6 µs` roundtrip) giving AI agents 6 anytime-valid statistical tools: multi-agent consensus stopping (`ASC-D`/`CITE`), correlated judge-panel `n_eff` auditing, clustered rollout population certification, sequential agent racing, `Active-PPI++`, and poisoning-resistant `SafeFuse` aggregation.

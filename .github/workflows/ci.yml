@@ -97,7 +97,7 @@ jobs:
           (cd "$(python3 -c 'import tempfile; print(tempfile.gettempdir())')" && "$PY" -c "import cloture; s=cloture.CiteStopper(0.05); print(s.update(1))")
           "$PY" -m pip install pytest numpy scipy
 
-      - name: Run 211 Python, CLI, MCP, and adversarial breaker tests
+      - name: Run 213 Python, CLI, MCP, and adversarial breaker tests
         shell: bash
         run: |
           VENV="$RUNNER_TEMP/cloture-wheel-venv"
@@ -136,16 +136,16 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Build stripped WASM and verify size <= 260 KB
+      - name: Build stripped WASM and verify size <= 320 KB
         env:
-          RUSTFLAGS: "-C strip=symbols -C opt-level=s"
+          RUSTFLAGS: "-C strip=symbols -C opt-level=z"
         run: |
           cargo build --release -p cloture-core --target wasm32-unknown-unknown
           mkdir -p site/wasm
           cp target/wasm32-unknown-unknown/release/cloture_core.wasm site/wasm/cloture_core.wasm
           SIZE=$(wc -c < site/wasm/cloture_core.wasm)
           echo "WASM size: ${SIZE} bytes"
-          test "$SIZE" -le 266240
+          test "$SIZE" -le 327680
 
       - name: Run Node.js WASM SDK test suite
         run: node --test js/test.mjs

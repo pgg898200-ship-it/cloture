@@ -27,20 +27,20 @@ jobs:
 
       - name: Build stripped zero-import WebAssembly core
         env:
-          RUSTFLAGS: "-C strip=symbols -C opt-level=s"
+          RUSTFLAGS: "-C strip=symbols -C opt-level=z"
         run: cargo build --release -p cloture-core --target wasm32-unknown-unknown
 
       - name: Assemble static site, interactive WASM playground, charts & raw Markdown endpoints
         run: |
           rm -rf _site && mkdir -p _site/docs/assets _site/benchmarks _site/wasm _site/js
-          cp site/index.html site/playground.html _site/
+          cp site/index.html site/playground.html site/robots.txt site/sitemap.xml _site/
           cp target/wasm32-unknown-unknown/release/cloture_core.wasm _site/wasm/cloture_core.wasm
           chmod 644 _site/wasm/cloture_core.wasm
           cp js/cloture.mjs js/cloture.d.ts _site/js/
           cp README.md llms.txt llms-full.txt SKILL.md NOTICE LICENSE CHANGELOG.md server.json _site/
-          cp docs/ARCHITECTURE.md docs/benchmarks.md docs/comparisons.md docs/integrations.md _site/docs/
+          cp docs/ARCHITECTURE.md docs/benchmarks.md docs/comparisons.md docs/integrations.md docs/REAL_WORLD_EVAL.md _site/docs/
           cp docs/assets/*.svg _site/docs/assets/
-          cp benchmarks/results.json _site/benchmarks/results.json
+          cp benchmarks/results.json benchmarks/rewardbench_receipts.json _site/benchmarks/
           cp include/cloture.h _site/cloture.h
           touch _site/.nojekyll
 

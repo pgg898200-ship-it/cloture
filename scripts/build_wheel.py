@@ -27,7 +27,7 @@ from typing import List, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_NAME = "cloture"
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 
 
 def _default_lib_path() -> Path:

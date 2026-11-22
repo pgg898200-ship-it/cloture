@@ -72,43 +72,38 @@ async def solve_open_ended(prompt: str, call_agent_async):
 
 ---
 
-## 3. Audit an Existing LLM-as-a-Judge Pipeline (Inspect AI / Promptfoo / Braintrust / LangSmith)
+## 3. Audit an Existing LLM-as-a-Judge Pipeline (CSV / JSONL / Promptfoo / Inspect AI / Braintrust)
 
-Export judge categorical verdicts (`N x K` row-major matrix, where `votes[i][j]` is judge `j`'s label on item `i`) and ground-truth labels (`gold[i]`) to JSON or Python lists, then check whether your judge panel has correlated error collapse:
+Zero-dependency 1-line audit directly from CSV, JSONL, or Promptfoo JSON exports (no pandas or NumPy required):
 
 ```python
 import cloture
 
-# votes[i][j] = judge j's integer label on item i (shape: n_items x k_judges)
-# gold[i]     = ground-truth integer label on item i (length: n_items)
-report = cloture.audit_panel(
-    votes=votes,
-    gold=gold,
-    n_perms=2000,
-    n_condorcet_sims=2000,
-    n_boot=1000,
-)
+# 1. Direct CSV export (supports arbitrary strings like "pass"/"fail" or integers)
+res = cloture.audit_csv("judges.csv", gold_col="gold", strata_col="domain")
+print(f"{res.report.k_judges} judges -> {res.report.n_eff_kish:.2f} effective votes | prune: {res.prunable_judges()}")
 
-print(f"Judges: {report.k_judges} -> Effective independent votes (Kish): {report.n_eff_kish:.2f}")
-print(f"95% CI: [{report.n_eff_ci_low:.2f}, {report.n_eff_ci_high:.2f}] | Eigen n_eff: {report.n_eff_eigen:.2f}")
+# 2. Direct Promptfoo eval output (`promptfoo eval -o results.json`)
+pf = cloture.audit_promptfoo("results.json")
+print(f"Promptfoo providers: {pf.judge_names} -> n_eff={pf.report.n_eff_kish:.2f}")
+
+# 3. Direct integer vote matrices (N x K row-major)
+report = cloture.audit_panel(votes=votes, gold=gold, n_perms=2000, n_condorcet_sims=2000, n_boot=1000)
 print(f"Condorcet gap: {report.condorcet_gap * 100:.2f} pp (omnibus permutation p={report.permutation_p_value:.5f})")
-
-for j, (d_acc, d_neff) in enumerate(zip(report.loo_delta_acc, report.loo_delta_neff)):
-    if d_acc >= 0.0:
-        print(f"Prune candidate: judge #{j} (dropping changes accuracy by {d_acc*100:+.2f} pp, n_eff {d_neff:+.2f})")
 ```
 
-Or zero-code from the CLI on any JSON file `{"votes": [[...]], "gold": [...]}`:
+Or zero-code from the static CLI directly on CSV or JSON (including stdin `--csv -`):
 
 ```bash
-cloture audit --file panel.json --perms 2000
+cloture audit --csv judges.csv --gold-col gold --strata-col domain --perms 2000
+cloture audit --file panel.json --perms 2000 --json
 ```
 
 ---
 
 ## 4. Claude Code, Cursor, Codex & Windsurf (MCP Server)
 
-`cloture mcp` runs a zero-dependency JSON-RPC 2.0 MCP server over stdio (`76.7 µs` median tool latency, `2.47 MiB` static binary).
+`cloture mcp` runs a zero-dependency JSON-RPC 2.0 MCP server over stdio (`67.6 µs` median tool latency, `2.91 MiB` static binary).
 
 ### Claude Code
 
@@ -187,4 +182,23 @@ int main(void) {
     cloture_cite_free(s);
     return 0;
 }
+```
+
+---
+
+## 7. JavaScript / TypeScript / Node / Deno / Bun / Cloudflare Workers (Zero-Import WASM)
+
+`cloture-core` compiles to a **`243 KB` (`81 KB` gzipped)** standalone WebAssembly module with **`0` host imports** (`js/cloture.mjs` + `js/cloture.d.ts`):
+
+```javascript
+import { loadCloture } from "./js/cloture.mjs";
+
+const cloture = await loadCloture("https://pgg898200-ship-it.github.io/cloture/wasm/cloture_core.wasm");
+
+// Cancel remaining in-flight fetch/LLM calls via AbortSignal the millisecond consensus certifies
+const res = await cloture.consensus(
+  async (callIdx, signal) => callOpenAI(prompt, { seed: callIdx, signal }),
+  { delta: 0.05, maxCalls: 32, concurrency: 6 }
+);
+console.log(res.winner, `certified in ${res.nSamples} calls (cancelled ${res.nCancelled})`);
 ```

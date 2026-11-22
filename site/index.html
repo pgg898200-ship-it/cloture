@@ -4,11 +4,26 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>cloture — Anytime-Valid Multi-Agent Consensus, Panel Auditing &amp; Active-PPI++</title>
-  <meta name="description" content="Zero-dependency Rust core, 2.47 MiB static CLI/MCP binary, C ABI, and zero-dependency Python SDK for sub-microsecond anytime-valid multi-agent stopping, judge-panel n_eff auditing, sequential racing, and Active-PPI++." />
+  <meta name="description" content="Zero-dependency Rust core, 2.91 MiB static CLI/MCP binary, C ABI, 243 KB zero-import WASM, and zero-dependency Python SDK for sub-microsecond anytime-valid multi-agent stopping, judge-panel n_eff auditing, sequential racing, and Active-PPI++." />
   <link rel="alternate" type="text/markdown" title="llms.txt" href="llms.txt" />
   <link rel="alternate" type="text/markdown" title="llms-full.txt" href="llms-full.txt" />
   <link rel="alternate" type="text/markdown" title="SKILL.md" href="SKILL.md" />
   <link rel="alternate" type="application/json" title="Benchmark Receipts" href="benchmarks/results.json" />
+  <link rel="alternate" type="application/json" title="RewardBench Real-World Receipts" href="benchmarks/rewardbench_receipts.json" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "cloture",
+    "description": "Zero-dependency Rust, Python, CLI, MCP, and 243 KB zero-import WebAssembly engine for sub-microsecond anytime-valid multi-agent consensus stopping, correlated LLM-as-a-judge panel auditing, sequential racing, and Active-PPI++.",
+    "codeRepository": "https://github.com/pgg898200-ship-it/cloture",
+    "url": "https://pgg898200-ship-it.github.io/cloture/",
+    "license": "https://opensource.org/licenses/MIT",
+    "programmingLanguage": ["Rust", "Python", "JavaScript", "WebAssembly", "C"],
+    "runtimePlatform": ["Linux", "macOS", "Windows", "WebAssembly"],
+    "softwareVersion": "0.2.0"
+  }
+  </script>
   <style>
     :root {
       --bg: #0b0e14;
@@ -189,37 +204,34 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="brand"><span>cloture</span> v0.1.0</div>
+      <div class="brand"><span>cloture</span> v0.2.0</div>
       <nav>
         <a href="playground.html" style="color:var(--accent);font-weight:700;">Live Playground</a>
+        <a href="docs/REAL_WORLD_EVAL.md">RewardBench Study</a>
         <a href="https://github.com/pgg898200-ship-it/cloture">GitHub</a>
         <a href="docs/benchmarks.md">Benchmarks</a>
         <a href="docs/comparisons.md">Comparisons</a>
         <a href="docs/integrations.md">Integrations</a>
-        <a href="docs/ARCHITECTURE.md">Proofs</a>
         <a href="llms.txt">llms.txt</a>
-        <a href="SKILL.md">SKILL.md</a>
       </nav>
     </header>
 
     <section class="hero">
-      <div class="pill">0 external Rust crates &middot; 0 Python runtime deps &middot; 215 KB zero-import WASM &middot; 266+ tests</div>
+      <div class="pill">0 external Rust crates &middot; 0 Python runtime deps &middot; 243 KB zero-import WASM &middot; 282 tests</div>
       <h1>End the multi-agent debate the millisecond the math proves who won.</h1>
       <p class="lead">
         And catch when your LLM-as-a-judge panel is <strong>2.2 correlated votes wearing 9 trench coats</strong>.
-        Sub-microsecond anytime-valid consensus stopping (<code>ASC-D</code>, <code>CITE</code>), correlated-panel
-        <code>n_eff</code> auditing, sequential agent racing, <code>Active-PPI++</code>, poisoning quarantine,
-        and <code>712 B</code> distributed evidence monoids.
+        Audited on <strong>2,985 real AllenAI RewardBench items</strong>: pruning 11 frontier judges to 3 raised accuracy <strong>+3.85 pp (92.0% &rarr; 95.9%)</strong> while cutting API cost <strong>72.7%</strong>.
       </p>
       <p style="margin:0 0 1.5rem;">
-        <a href="playground.html" style="display:inline-block;background:var(--accent);color:#061312;font-family:var(--mono);font-weight:700;font-size:0.9rem;padding:0.65rem 1.15rem;border-radius:8px;text-decoration:none;">Launch Live Browser Playground (215 KB Rust WASM) &rarr;</a>
+        <a href="playground.html" style="display:inline-block;background:var(--accent);color:#061312;font-family:var(--mono);font-weight:700;font-size:0.9rem;padding:0.65rem 1.15rem;border-radius:8px;text-decoration:none;">Launch Live Browser Playground (243 KB Rust WASM) &rarr;</a>
       </p>
 
       <div class="install-box">
         <div class="tabs" role="tablist">
           <button class="tab active" data-cmd="pip install cloture">Python (pip)</button>
           <button class="tab" data-cmd="curl -fsSL https://raw.githubusercontent.com/pgg898200-ship-it/cloture/main/scripts/install.sh | sh">Static CLI (curl)</button>
-          <button class="tab" data-cmd="cargo install cloture-cli">Rust (cargo)</button>
+          <button class="tab" data-cmd="brew install pgg898200-ship-it/cloture/cloture">Homebrew</button>
           <button class="tab" data-cmd="claude mcp add cloture -- cloture mcp">Claude Code MCP</button>
         </div>
         <div class="cmd-row">
@@ -228,34 +240,35 @@
         </div>
       </div>
 
-      <img src="docs/assets/consensus_and_panel.svg" alt="cloture consensus stopping and correlated judge-panel audit benchmark chart" style="width:100%;height:auto;border-radius:12px;margin:0.5rem 0 1.25rem;" />
+      <img src="docs/assets/rewardbench_real_world.svg" alt="Real-world AllenAI RewardBench 2985-item frontier judge pruning and correlation collapse chart" style="width:100%;height:auto;border-radius:12px;margin:0.5rem 0 1.25rem;" />
+      <img src="docs/assets/consensus_and_panel.svg" alt="cloture consensus stopping and correlated judge-panel audit benchmark chart" style="width:100%;height:auto;border-radius:12px;margin:0 0 1.25rem;" />
       <img src="docs/assets/speed_and_validity.svg" alt="cloture speedup vs PyPI packages and anytime-valid Type-I error control chart" style="width:100%;height:auto;border-radius:12px;margin:0 0 1.5rem;" />
 
       <div class="grid">
         <div class="card">
-          <div class="metric">67–92%</div>
-          <div class="card-title">Fewer Agent Rollouts</div>
-          <div class="card-sub">Grey-box <code>AscdStopper</code> stops easy prompts in 21 calls with 100% accuracy &amp; 0.0% tie-null FPR (vs. 28.5% naive peeking).</div>
+          <div class="metric">85.5&times;</div>
+          <div class="card-title">Sub-&micro;s Consensus Stopping</div>
+          <div class="card-sub"><code>AscdStopper</code> runs in <code>668 ns</code> (67&ndash;92% fewer rollouts, 0.0% tie-null FPR vs. 28.5% naive peeking).</div>
         </div>
         <div class="card">
-          <div class="metric">2.21 / 9</div>
+          <div class="metric">55.7&times;</div>
           <div class="card-title">Correlated Panel Audit</div>
-          <div class="card-sub">4.8&times; faster than NumPy/SciPy (<code>317.7 ms</code>). Dropping 2 redundant judges raised accuracy +2.72 pp at -22.2% cost.</div>
+          <div class="card-sub">9&times;1,000 audit in <code>26.0 ms</code> vs. NumPy/SciPy <code>1.45 s</code>; RewardBench 11&rarr;3 pruning lifts accuracy <strong>+3.85 pp</strong> at -72.7% cost.</div>
         </div>
         <div class="card">
-          <div class="metric">11,112&times;</div>
+          <div class="metric">415&times;</div>
+          <div class="card-title">Faster Betting &amp; EB-CS</div>
+          <div class="card-sub"><code>BettingCS</code> <code>330 ns</code> vs. <code>confseq</code> <code>137 &mu;s</code>; <code>EB-CS</code> <code>16.0 ns</code> batch (<strong>25.7&times;</strong> vs. <code>confseq</code>, <strong>297&times;</strong> stream vs. <code>expectation</code>).</div>
+        </div>
+        <div class="card">
+          <div class="metric">11,276&times;</div>
           <div class="card-title">Faster Agent Racing</div>
-          <div class="card-sub">6-arm 200-task paired race finishes in <code>2.75 ms</code> (75% evals saved, 0.0% FWER) vs. <code>bayesbench</code> 30.5 s.</div>
-        </div>
-        <div class="card">
-          <div class="metric">2,930&times;</div>
-          <div class="card-title">Faster Online Conformal</div>
-          <div class="card-sub">4-rate <code>AgACI</code> updates in <code>64.5 ns</code> Rust (94.4% post-shift recovery vs. 68.0% <code>online-cp</code> CRR).</div>
+          <div class="card-sub">6-arm paired race finishes in <code>2.60 ms</code> (75% evals saved, 0.0% FWER) vs. <code>bayesbench</code> 29.3 s; RewardBench saves 80.4%.</div>
         </div>
       </div>
     </section>
 
-    <h2>10-Second Python Drop-In</h2>
+    <h2>10-Second Python &amp; CLI Drop-In</h2>
 <pre>import cloture
 
 # Stop parallel LLM/agent rollouts the instant consensus is certified (cancels in-flight tasks)
@@ -266,27 +279,33 @@ result = await cloture.consensus(
     concurrency=8,
 )
 
-# Audit an LLM-as-a-judge panel for correlated error collapse
-report = cloture.audit_panel(votes, gold, n_perms=2000, n_condorcet_sims=2000, n_boot=1000)
+# Audit any CSV or Promptfoo eval export directly (or run: cloture audit --csv judges.csv)
+report = cloture.audit_csv("judges.csv", gold_col="gold", strata_col="subset")
 print(f"{report.k_judges} judges -&gt; {report.n_eff_kish:.2f} effective votes (Condorcet gap {report.condorcet_gap*100:.1f} pp)")</pre>
 
-    <h2>Verified Head-to-Head Summary</h2>
+    <h2>Verified Head-to-Head Summary (<code>v0.2.0</code>)</h2>
     <table>
       <thead>
-        <tr><th>Benchmark Suite</th><th><code>cloture</code></th><th>Installed Baseline / Competitor</th><th>Measured Edge</th></tr>
+        <tr><th>Benchmark Suite</th><th><code>cloture v0.2.0</code></th><th>Installed Baseline / Competitor</th><th>Measured Edge</th></tr>
       </thead>
       <tbody>
         <tr>
           <td>Consensus Stopping (<code>K=4</code> Easy, <code>&delta;=0.05</code>)</td>
-          <td><code>21.0</code> calls, <code>0.0%</code> tie FPR, <code>2.21 &mu;s</code></td>
-          <td>Fixed-64 / Naive Peeking (<code>28.5%</code> FPR) / NumPy (<code>63.8 &mu;s</code>)</td>
-          <td><strong>67.2%</strong> fewer calls, <strong>28.9&times;</strong> faster</td>
+          <td><code>21.0</code> calls, <code>0.0%</code> tie FPR, <code>668 ns</code></td>
+          <td>Fixed-64 / Naive Peeking (<code>28.5%</code> FPR) / NumPy (<code>57.1 &mu;s</code>)</td>
+          <td><strong>67.2%</strong> fewer calls, <strong>85.5&times;</strong> faster</td>
         </tr>
         <tr>
           <td>Judge Panel Audit (<code>9 &times; 1,000</code>)</td>
-          <td><code>317.7 ms</code> (<code>max diff 2.66e-15</code>)</td>
-          <td>Vectorized NumPy / SciPy (<code>1,539.7 ms</code>)</td>
-          <td><strong>4.8&times;</strong> faster, <code>+2.72 pp</code> pruned lift</td>
+          <td><code>26.0 ms</code> (<code>max diff 2.66e-15</code>)</td>
+          <td>Vectorized NumPy / SciPy (<code>1,446.7 ms</code>)</td>
+          <td><strong>55.7&times;</strong> faster, <code>+2.72 pp</code> pruned lift</td>
+        </tr>
+        <tr>
+          <td>Real AllenAI RewardBench (<code>2,985</code> items, 11 LLMs)</td>
+          <td><code>11 &rarr; 3</code> judges: <strong>95.88%</strong> acc, <code>67.2 ms</code></td>
+          <td>Full 11-model panel (<code>92.03%</code>) / Best single RM (<code>94.97%</code>)</td>
+          <td><strong>+3.85 pp</strong> higher acc at <strong>-72.7%</strong> API cost</td>
         </tr>
         <tr>
           <td>Correlated Rollouts (<code>&rho;=0.60</code>, <code>30&times;16</code>)</td>
@@ -295,27 +314,28 @@ print(f"{report.k_judges} judges -&gt; {report.n_eff_kish:.2f} effective votes (
           <td>Exact validity + <strong>3.2&times;</strong> power via <code>optimal_rollouts</code></td>
         </tr>
         <tr>
-          <td>Betting CS (<code>G=201</code>) &amp; EB-CS</td>
-          <td><code>6.32 &mu;s</code> / <code>88.9 ns</code> Rust (<code>110 ns</code> Py batch)</td>
-          <td><code>confseq.hedged_cs</code> (<code>179 &mu;s</code>) / <code>predmix</code> (<code>442 ns</code>)</td>
-          <td><strong>28.4&times;</strong> / <strong>4.0&times;</strong> faster &amp; tighter</td>
+          <td>Betting CS (<code>G=201</code>) &amp; EB-CS (<code>100k</code> batch)</td>
+          <td><code>330 ns</code> (<code>281 ns</code> Rust) / <code>16.0 ns</code> batch</td>
+          <td><code>confseq</code> (<code>137 &mu;s</code> / <code>410 ns</code>) &amp; <code>expectation</code> (<code>17.6 ns</code> / <code>1.09 ms</code>)</td>
+          <td><strong>415&times;</strong> / <strong>25.7&times;</strong> vs. <code>confseq</code>; <strong>1.10&times;</strong> batch &amp; <strong>297&times;</strong> stream vs. <code>expectation</code></td>
         </tr>
         <tr>
-          <td>Active-PPI++ (<code>N=4000</code>, 10% audit, <code>+0.15</code> bias)</td>
-          <td><code>99.0%</code> anytime cov, <code>6.29&times;</code> var reduction</td>
+          <td>Active-PPI++ (<code>N=4000</code> &amp; Real RewardBench)</td>
+          <td><code>99&ndash;100%</code> anytime cov, <code>6.3&ndash;10.5&times;</code> var red</td>
           <td><code>ppi-python</code> peeking (<code>71.0%</code> cov) / Naive judge (<code>0.0%</code>)</td>
           <td>Exact anytime validity &amp; adversarial guard</td>
         </tr>
         <tr>
-          <td>SafeFuse &amp; 712 B EvidenceSketch</td>
-          <td><code>100%</code> dual-poison quarantine, <code>76.3 ns</code> merge</td>
-          <td>Uniform ensemble (<code>+200.0</code> excess loss)</td>
-          <td><code>0.0%</code> clean FWER, <code>0.0</code> exact 1k-worker diff</td>
+          <td>Online Conformal &amp; 712 B EvidenceSketch</td>
+          <td><code>59.7 ns</code> AgACI, <code>70.5 ns</code> merge, <code>100%</code> poison quarantine</td>
+          <td><code>online-cp</code> SimpleJumper (<code>196.8 &mu;s</code>) / CRR (<code>68.0%</code> post-shift)</td>
+          <td><strong>3,294&times;</strong> faster, <code>94.4%</code> shift recovery, <code>0.0</code> fleet diff</td>
         </tr>
       </tbody>
     </table>
     <p style="font-size:0.9rem;color:var(--muted);">
       Raw machine-verifiable receipts: <a href="benchmarks/results.json">benchmarks/results.json</a> &middot;
+      Real-world RewardBench receipts: <a href="benchmarks/rewardbench_receipts.json">benchmarks/rewardbench_receipts.json</a> &middot;
       Full report &amp; honest scope boundaries: <a href="docs/benchmarks.md">docs/benchmarks.md</a> &middot;
       Tool matrix: <a href="docs/comparisons.md">docs/comparisons.md</a>.
     </p>

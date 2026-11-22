@@ -18,7 +18,8 @@
 use std::collections::HashMap;
 
 use crate::math::{
-    fnv1a_64, log_mean_exp_grid, CompSum, DEFAULT_BET_GRID, GRID_LEN, LOG1M_GRID, LOG1P_GRID,
+    add_bet_grid_pair, fast_ln_1p_bounded, fnv1a_64, log_mean_exp_grid, log_mean_exp_grid_with_max,
+    max_grid, CompSum, DEFAULT_BET_GRID, GRID_LEN, LN_GRID_LEN, LOG1M_GRID, LOG1P_GRID,
 };
 
 /// Scope of a sequential mode or population certificate.
@@ -141,11 +142,11 @@ impl AscdStopper {
         }
     }
 
-    #[inline]
+    #[inline(always)]
     fn add_score(&mut self, idx: usize, x: f64) {
         let s = self.scores[idx];
         let t = s + x;
-        if s.abs() >= x.abs() {
+        if s >= x {
             self.scores_comp[idx] += (s - t) + x;
         } else {
             self.scores_comp[idx] += (x - t) + s;
@@ -158,11 +159,12 @@ impl AscdStopper {
     /// Invalid inputs (wrong length, any NaN/Inf entry, or non-positive total mass
     /// after clamping negative entries to zero) are safely ignored without mutating state.
     pub fn update(&mut self, probs: &[f64]) -> ModeDecision {
-        if probs.len() != self.k {
+        let k = self.k;
+        if probs.len() != k {
             return self.decision();
         }
         let mut sum = 0.0_f64;
-        for (slot, &v) in self.scratch.iter_mut().zip(probs.iter()) {
+        for (slot, &v) in self.scratch[..k].iter_mut().zip(probs.iter()) {
             if !v.is_finite() {
                 return self.decision();
             }
@@ -170,43 +172,52 @@ impl AscdStopper {
             *slot = c;
             sum += c;
         }
-        if !sum.is_finite() || sum <= 0.0 {
+        if !(sum > 0.0 && sum < f64::INFINITY) {
             return self.decision();
         }
-        let inv_sum = 1.0 / sum;
-        if inv_sum.is_finite() {
-            for slot in &mut self.scratch {
-                *slot = (*slot * inv_sum).clamp(0.0, 1.0);
+        if sum == 1.0 {
+            self.n_samples += 1;
+            for a in 0..k {
+                let pa = self.scratch[a];
+                if pa > 0.0 {
+                    self.add_score(a, pa);
+                }
             }
         } else {
-            for slot in &mut self.scratch {
-                *slot = (*slot / sum).clamp(0.0, 1.0);
+            let inv_sum = 1.0 / sum;
+            if inv_sum.is_finite() {
+                for slot in &mut self.scratch[..k] {
+                    *slot = (*slot * inv_sum).clamp(0.0, 1.0);
+                }
+            } else {
+                for slot in &mut self.scratch[..k] {
+                    *slot = (*slot / sum).clamp(0.0, 1.0);
+                }
+            }
+            self.n_samples += 1;
+            for a in 0..k {
+                let pa = self.scratch[a];
+                if pa > 0.0 {
+                    self.add_score(a, pa);
+                }
             }
         }
 
-        self.n_samples += 1;
-        let k = self.k;
+        let scratch = &self.scratch[..k];
+        let mut tail = &mut self.log_wealth[..k * k];
         for a in 0..k {
-            let pa = self.scratch[a];
-            if pa > 0.0 {
-                self.add_score(a, pa);
-            }
-        }
-        for a in 0..k {
-            let pa = self.scratch[a];
-            let row_offset = a * k;
-            for b in 0..k {
-                if a == b {
-                    continue;
-                }
-                let diff = (pa - self.scratch[b]).clamp(-1.0, 1.0);
+            let (row_a, rest) = tail.split_at_mut(k);
+            tail = rest;
+            let pa = scratch[a];
+            for b in (a + 1)..k {
+                // Both pa and scratch[b] are in [0.0, 1.0], so diff is guaranteed in [-1.0, 1.0].
+                let diff = pa - scratch[b];
                 if diff == 0.0 {
                     continue;
                 }
-                let cell = &mut self.log_wealth[row_offset + b];
-                for g in 0..GRID_LEN {
-                    cell[g] += (DEFAULT_BET_GRID[g] * diff).ln_1p();
-                }
+                let cell_ab = &mut row_a[b];
+                let cell_ba = &mut tail[(b - a - 1) * k + a];
+                add_bet_grid_pair(cell_ab, cell_ba, diff);
             }
         }
         self.decision()
@@ -262,8 +273,8 @@ impl AscdStopper {
         } else {
             for g in 0..GRID_LEN {
                 let lc = DEFAULT_BET_GRID[g] * c;
-                pos_inc[g] = lc.ln_1p();
-                neg_inc[g] = (-lc).ln_1p();
+                pos_inc[g] = fast_ln_1p_bounded(lc);
+                neg_inc[g] = fast_ln_1p_bounded(-lc);
             }
         }
         let k = self.k;
@@ -301,16 +312,19 @@ impl AscdStopper {
         }
         let k = self.k;
         let mut leader = 0usize;
+        let mut runner_up = 1usize;
         let mut leader_score = self.scores[0] + self.scores_comp[0];
         let mut second_score = f64::NEG_INFINITY;
         for a in 1..k {
             let s = self.scores[a] + self.scores_comp[a];
             if s > leader_score {
                 second_score = leader_score;
+                runner_up = leader;
                 leader_score = s;
                 leader = a;
             } else if s > second_score {
                 second_score = s;
+                runner_up = a;
             }
         }
         if !second_score.is_finite() {
@@ -318,12 +332,19 @@ impl AscdStopper {
         }
 
         let row_offset = leader * k;
-        let mut min_log_w = f64::INFINITY;
+        // Evaluate the closest challenger (runner_up) first so the exact lower bound
+        // `max_grid(lw) - LN_GRID_LEN <= log_mean_exp_grid(lw)` prunes dominated challengers.
+        let mut min_log_w = log_mean_exp_grid(&self.log_wealth[row_offset + runner_up]);
         for j in 0..k {
-            if j == leader {
+            if j == leader || j == runner_up {
                 continue;
             }
-            let lw = log_mean_exp_grid(&self.log_wealth[row_offset + j]);
+            let arr = &self.log_wealth[row_offset + j];
+            let m = max_grid(arr);
+            if m.is_finite() && (m - LN_GRID_LEN) >= min_log_w {
+                continue;
+            }
+            let lw = log_mean_exp_grid_with_max(arr, m);
             if lw < min_log_w {
                 min_log_w = lw;
             }
@@ -353,7 +374,7 @@ impl AscdStopper {
             n_samples: self.n_samples,
             log_evidence: min_log_w,
             log_threshold: self.log_threshold,
-            margin_estimate: (leader_score - second_score) / (self.n_samples as f64),
+            margin_estimate: (leader_score - second_score) / ((self.n_samples as i64) as f64),
             scope,
             deterministic_lock: det_lock,
         }
@@ -608,8 +629,8 @@ impl CiteStopper {
         let mut neg_inc = [0.0_f64; GRID_LEN];
         for g in 0..GRID_LEN {
             let lw = DEFAULT_BET_GRID[g] * w;
-            pos_inc[g] = lw.ln_1p();
-            neg_inc[g] = (-lw).ln_1p();
+            pos_inc[g] = fast_ln_1p_bounded(lw);
+            neg_inc[g] = fast_ln_1p_bounded(-lw);
         }
 
         self.n_samples += 1;
@@ -960,7 +981,7 @@ impl PopulationCert {
 
         // Unit-level anytime-valid betting e-process.
         for g in 0..GRID_LEN {
-            self.log_wealth[g] += (DEFAULT_BET_GRID[g] * u_q).ln_1p();
+            self.log_wealth[g] += fast_ln_1p_bounded(DEFAULT_BET_GRID[g] * u_q);
         }
 
         self.decision()
@@ -1573,6 +1594,113 @@ mod tests {
         assert_eq!(d2.n_units, before);
         let d3 = pc.add_unit_rollouts(&[]);
         assert_eq!(d3.n_units, before);
+    }
+
+    #[test]
+    fn ascd_antisymmetric_25_stream_exact_parity_and_tie_null() {
+        let mut rng = Rng::from_seed(0xA5CD_2525);
+        let ks = [2usize, 3, 4, 5, 8];
+        let mut parity_matches = 0usize;
+
+        for case_idx in 0..25 {
+            let k = ks[case_idx % ks.len()];
+            let delta = if case_idx % 2 == 0 { 0.05 } else { 0.01 };
+            let mut stopper = AscdStopper::new(k, delta, None).unwrap();
+            let log_thresh = ((k as f64) / delta).ln();
+            let mut ref_scores = vec![0.0_f64; k];
+            let mut ref_lw = vec![[0.0_f64; GRID_LEN]; k * k];
+
+            let mut fast_stop = None;
+            let mut ref_stop = None;
+            let winner_bias = 0.25 + 0.05 * ((case_idx % 5) as f64);
+
+            for step in 1..=200 {
+                let mut probs = vec![0.0_f64; k];
+                if case_idx % 7 == 0 && step % 5 == 0 {
+                    // Exact one-hot step
+                    probs[0] = 1.0;
+                } else if case_idx % 7 == 1 && step % 3 == 0 {
+                    // Near-tie step (exercises |diff| < 0.02 path)
+                    let base = 1.0 / (k as f64);
+                    for a in 0..k {
+                        probs[a] = base + if a == 0 { 1e-3 } else { -1e-3 / ((k - 1) as f64) };
+                    }
+                } else {
+                    let mut s = 0.0;
+                    for a in 0..k {
+                        let w = rng.next_f64() + if a == 0 { winner_bias } else { 0.0 };
+                        probs[a] = w;
+                        s += w;
+                    }
+                    for p in &mut probs {
+                        *p /= s;
+                    }
+                }
+
+                let d = stopper.update(&probs);
+                for a in 0..k {
+                    ref_scores[a] += probs[a];
+                    for b in 0..k {
+                        if a == b {
+                            continue;
+                        }
+                        let diff = (probs[a] - probs[b]).clamp(-1.0, 1.0);
+                        for g in 0..GRID_LEN {
+                            ref_lw[a * k + b][g] += (DEFAULT_BET_GRID[g] * diff).ln_1p();
+                        }
+                    }
+                }
+                let mut ref_leader = 0usize;
+                for a in 1..k {
+                    if ref_scores[a] > ref_scores[ref_leader] {
+                        ref_leader = a;
+                    }
+                }
+                let mut ref_min_lw = f64::INFINITY;
+                for b in 0..k {
+                    if b == ref_leader {
+                        continue;
+                    }
+                    let arr = &ref_lw[ref_leader * k + b];
+                    let m = arr.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+                    let lw = m
+                        + arr.iter().map(|&v| (v - m).exp()).sum::<f64>().ln()
+                        - (GRID_LEN as f64).ln();
+                    if lw < ref_min_lw {
+                        ref_min_lw = lw;
+                    }
+                }
+                assert!(
+                    (d.log_evidence - ref_min_lw).abs() < 1e-11,
+                    "case {case_idx} step {step}: log_evidence {} vs {}",
+                    d.log_evidence,
+                    ref_min_lw
+                );
+                if fast_stop.is_none() && d.certified {
+                    fast_stop = Some((step, d.winner));
+                }
+                if ref_stop.is_none() && ref_min_lw >= log_thresh {
+                    ref_stop = Some((step, Some(ref_leader)));
+                }
+                if fast_stop.is_some() && ref_stop.is_some() {
+                    break;
+                }
+            }
+            assert_eq!(fast_stop, ref_stop, "stopping mismatch on case {case_idx}");
+            parity_matches += 1;
+        }
+        assert_eq!(parity_matches, 25);
+
+        // Exact tie-null: deterministic tied probability vectors must produce 0.0% Type-I error.
+        for &k in &[2usize, 4] {
+            let tie_p = vec![1.0 / (k as f64); k];
+            let mut stopper = AscdStopper::new(k, 0.05, None).unwrap();
+            for _ in 0..200 {
+                let d = stopper.update(&tie_p);
+                assert!(!d.certified, "tie-null falsely certified for k={k}");
+                assert_eq!(d.log_evidence, 0.0);
+            }
+        }
     }
 }
 

@@ -4,9 +4,12 @@ from __future__ import annotations
 import ctypes
 import os
 import platform
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Sequence, Tuple
+
+_DC_KWARGS = {"frozen": True, "slots": True} if sys.version_info >= (3, 10) else {"frozen": True}
 
 
 def _find_library() -> Path:
@@ -360,7 +363,7 @@ def _as_f64_ptr(seq: Sequence[float]) -> Tuple[object, ctypes.POINTER(ctypes.c_d
     return arr, arr, len(seq)
 
 
-@dataclass(frozen=True)
+@dataclass(**_DC_KWARGS)
 class ModeDecision:
     certified: bool
     deterministic_lock: bool
@@ -375,19 +378,19 @@ class ModeDecision:
     @classmethod
     def _from_c(cls, r: _CModeResult) -> "ModeDecision":
         return cls(
-            certified=bool(r.certified),
-            deterministic_lock=bool(r.deterministic_lock),
-            winner=int(r.winner) if r.has_winner else None,
-            leader=int(r.leader) if r.has_leader else None,
-            n_samples=int(r.n_samples),
-            log_evidence=float(r.log_evidence),
-            log_threshold=float(r.log_threshold),
-            margin_estimate=float(r.margin_estimate),
-            scope=_SCOPE_NAMES.get(int(r.scope), "realized_unit"),
+            bool(r.certified),
+            bool(r.deterministic_lock),
+            r.winner if r.has_winner else None,
+            r.leader if r.has_leader else None,
+            r.n_samples,
+            r.log_evidence,
+            r.log_threshold,
+            r.margin_estimate,
+            _SCOPE_NAMES.get(r.scope, "realized_unit"),
         )
 
 
-@dataclass(frozen=True)
+@dataclass(**_DC_KWARGS)
 class PopDecision:
     n_units: int
     total_rollouts: int
@@ -404,21 +407,21 @@ class PopDecision:
     @classmethod
     def _from_c(cls, r: _CPopResult) -> "PopDecision":
         return cls(
-            n_units=int(r.n_units),
-            total_rollouts=int(r.total_rollouts),
-            certified=bool(r.certified),
-            theta_hat=float(r.theta_hat),
-            sigma_b2=float(r.sigma_b2),
-            sigma_w2=float(r.sigma_w2),
-            rho_hat=float(r.rho_hat),
-            n_eff_within=float(r.n_eff_within),
-            saturation_ceiling=float(r.saturation_ceiling),
-            log_evidence=float(r.log_evidence),
-            log_threshold=float(r.log_threshold),
+            r.n_units,
+            r.total_rollouts,
+            bool(r.certified),
+            r.theta_hat,
+            r.sigma_b2,
+            r.sigma_w2,
+            r.rho_hat,
+            r.n_eff_within,
+            r.saturation_ceiling,
+            r.log_evidence,
+            r.log_threshold,
         )
 
 
-@dataclass(frozen=True)
+@dataclass(**_DC_KWARGS)
 class CsResult:
     n: int
     mean: float
@@ -428,16 +431,10 @@ class CsResult:
 
     @classmethod
     def _from_c(cls, r: _CCsResult) -> "CsResult":
-        return cls(
-            n=int(r.n),
-            mean=float(r.mean),
-            lower=float(r.lower),
-            upper=float(r.upper),
-            width=float(r.width),
-        )
+        return cls(r.n, r.mean, r.lower, r.upper, r.width)
 
 
-@dataclass(frozen=True)
+@dataclass(**_DC_KWARGS)
 class PairedResult:
     n_pairs: int
     mean_diff: float
@@ -449,16 +446,16 @@ class PairedResult:
     @classmethod
     def _from_c(cls, r: _CPairedResult) -> "PairedResult":
         return cls(
-            n_pairs=int(r.n_pairs),
-            mean_diff=float(r.mean_diff),
-            e_value_a_beats_b=float(r.e_value_a_beats_b),
-            e_value_b_beats_a=float(r.e_value_b_beats_a),
-            anytime_p_value=float(r.anytime_p_value),
-            winner=None if r.winner < 0 else int(r.winner),
+            r.n_pairs,
+            r.mean_diff,
+            r.e_value_a_beats_b,
+            r.e_value_b_beats_a,
+            r.anytime_p_value,
+            None if r.winner < 0 else r.winner,
         )
 
 
-@dataclass(frozen=True)
+@dataclass(**_DC_KWARGS)
 class PpiResult:
     n_total: int
     n_audited: int
@@ -472,18 +469,18 @@ class PpiResult:
     @classmethod
     def _from_c(cls, r: _CPpiResult) -> "PpiResult":
         return cls(
-            n_total=int(r.n_total),
-            n_audited=int(r.n_audited),
-            mean_estimate=float(r.mean_estimate),
-            lower=float(r.lower),
-            upper=float(r.upper),
-            width=float(r.width),
-            lambda_hat=float(r.lambda_hat),
-            variance_reduction=float(r.variance_reduction),
+            r.n_total,
+            r.n_audited,
+            r.mean_estimate,
+            r.lower,
+            r.upper,
+            r.width,
+            r.lambda_hat,
+            r.variance_reduction,
         )
 
 
-@dataclass(frozen=True)
+@dataclass(**_DC_KWARGS)
 class PanelReport:
     k_judges: int
     n_items: int
@@ -765,8 +762,11 @@ class EmpiricalBernsteinCS:
     """O(1) sub-microsecond anytime-valid Predictable Plug-In Empirical-Bernstein CS."""
 
     def __init__(self, alpha: float = 0.05, min_val: float = 0.0, max_val: float = 1.0) -> None:
-        self._lib = _get_lib()
-        self._ptr = self._lib.cloture_ebcs_new(float(alpha), float(min_val), float(max_val))
+        lib = _get_lib()
+        self._lib = lib
+        self._fn_update = lib.cloture_ebcs_update
+        self._fn_update_batch = lib.cloture_ebcs_update_batch
+        self._ptr = lib.cloture_ebcs_new(float(alpha), float(min_val), float(max_val))
         if not self._ptr:
             raise ValueError("Invalid EmpiricalBernsteinCS parameters")
 
@@ -777,19 +777,24 @@ class EmpiricalBernsteinCS:
             self._ptr = None
 
     def update(self, x: float) -> CsResult:
-        return CsResult._from_c(self._lib.cloture_ebcs_update(self._ptr, float(x)))
+        r = self._fn_update(self._ptr, x)
+        return CsResult(r.n, r.mean, r.lower, r.upper, r.width)
 
     def update_batch(self, xs: Sequence[float]) -> CsResult:
         _keep, ptr, n = _as_f64_ptr(xs)
-        return CsResult._from_c(self._lib.cloture_ebcs_update_batch(self._ptr, ptr, n))
+        r = self._fn_update_batch(self._ptr, ptr, n)
+        return CsResult(r.n, r.mean, r.lower, r.upper, r.width)
 
 
 class BettingCS:
     """Tightest finite-sample Hedged ONS Betting Confidence Sequence on [0, 1]."""
 
     def __init__(self, alpha: float = 0.05, grid_points: int = 201) -> None:
-        self._lib = _get_lib()
-        self._ptr = self._lib.cloture_betcs_new(float(alpha), int(grid_points))
+        lib = _get_lib()
+        self._lib = lib
+        self._fn_update = lib.cloture_betcs_update
+        self._fn_update_batch = lib.cloture_betcs_update_batch
+        self._ptr = lib.cloture_betcs_new(float(alpha), int(grid_points))
         if not self._ptr:
             raise ValueError("Invalid BettingCS parameters")
 
@@ -800,19 +805,24 @@ class BettingCS:
             self._ptr = None
 
     def update(self, x: float) -> CsResult:
-        return CsResult._from_c(self._lib.cloture_betcs_update(self._ptr, float(x)))
+        r = self._fn_update(self._ptr, x)
+        return CsResult(r.n, r.mean, r.lower, r.upper, r.width)
 
     def update_batch(self, xs: Sequence[float]) -> CsResult:
         _keep, ptr, n = _as_f64_ptr(xs)
-        return CsResult._from_c(self._lib.cloture_betcs_update_batch(self._ptr, ptr, n))
+        r = self._fn_update_batch(self._ptr, ptr, n)
+        return CsResult(r.n, r.mean, r.lower, r.upper, r.width)
 
 
 class PairedEProcess:
     """Exact paired anytime-valid e-process comparing Policy A vs Policy B."""
 
     def __init__(self, alpha: float = 0.05, scale: float = 1.0) -> None:
-        self._lib = _get_lib()
-        self._ptr = self._lib.cloture_paired_new(float(alpha), float(scale))
+        lib = _get_lib()
+        self._lib = lib
+        self._fn_update = lib.cloture_paired_update
+        self._fn_update_batch = lib.cloture_paired_update_batch
+        self._ptr = lib.cloture_paired_new(float(alpha), float(scale))
         if not self._ptr:
             raise ValueError("Invalid PairedEProcess parameters")
 
@@ -823,13 +833,13 @@ class PairedEProcess:
             self._ptr = None
 
     def update(self, a: float, b: float) -> PairedResult:
-        return PairedResult._from_c(self._lib.cloture_paired_update(self._ptr, float(a), float(b)))
+        return PairedResult._from_c(self._fn_update(self._ptr, a, b))
 
     def update_batch(self, a: Sequence[float], b: Sequence[float]) -> PairedResult:
         _ka, pa, na = _as_f64_ptr(a)
         _kb, pb, nb = _as_f64_ptr(b)
         n = min(na, nb)
-        return PairedResult._from_c(self._lib.cloture_paired_update_batch(self._ptr, pa, pb, n))
+        return PairedResult._from_c(self._fn_update_batch(self._ptr, pa, pb, n))
 
 
 class AgentRace:
@@ -875,8 +885,11 @@ class ActivePPI:
     """Anytime-valid online Active Prediction-Powered Inference (Active-PPI++ / AAELI)."""
 
     def __init__(self, alpha: float = 0.05, target_audit_rate: float = 0.10, min_audit_prob: float = 0.05) -> None:
-        self._lib = _get_lib()
-        self._ptr = self._lib.cloture_ppi_new(float(alpha), float(target_audit_rate), float(min_audit_prob))
+        lib = _get_lib()
+        self._lib = lib
+        self._fn_suggest = lib.cloture_ppi_suggest_prob
+        self._fn_observe = lib.cloture_ppi_observe
+        self._ptr = lib.cloture_ppi_new(float(alpha), float(target_audit_rate), float(min_audit_prob))
         if not self._ptr:
             raise ValueError("Invalid ActivePPI parameters")
 
@@ -887,13 +900,12 @@ class ActivePPI:
             self._ptr = None
 
     def suggest_prob(self, judge_pred: float, uncertainty_hint: float = -1.0) -> float:
-        return float(self._lib.cloture_ppi_suggest_prob(self._ptr, float(judge_pred), float(uncertainty_hint)))
+        return self._fn_suggest(self._ptr, judge_pred, uncertainty_hint)
 
     def observe(self, judge_pred: float, audited: bool, gold_label: float, audit_prob: float) -> PpiResult:
-        return PpiResult._from_c(
-            self._lib.cloture_ppi_observe(
-                self._ptr, float(judge_pred), 1 if audited else 0, float(gold_label), float(audit_prob)
-            )
+        r = self._fn_observe(self._ptr, judge_pred, 1 if audited else 0, gold_label, audit_prob)
+        return PpiResult(
+            r.n_total, r.n_audited, r.mean_estimate, r.lower, r.upper, r.width, r.lambda_hat, r.variance_reduction
         )
 
     def observe_batch(
@@ -1050,8 +1062,11 @@ class OnlineConformal:
     """4-rate crossing-free AgACI / DtACI online conformal controller."""
 
     def __init__(self, target_alpha: float = 0.10) -> None:
-        self._lib = _get_lib()
-        self._ptr = self._lib.cloture_conformal_new(float(target_alpha))
+        lib = _get_lib()
+        self._lib = lib
+        self._fn_update_pvalue = lib.cloture_conformal_update_pvalue
+        self._fn_update_miscovered = lib.cloture_conformal_update_miscovered
+        self._ptr = lib.cloture_conformal_new(float(target_alpha))
         if not self._ptr:
             raise ValueError(f"Invalid target_alpha={target_alpha}")
 
@@ -1062,18 +1077,18 @@ class OnlineConformal:
             self._ptr = None
 
     def update_pvalue(self, p: float) -> float:
-        return float(self._lib.cloture_conformal_update_pvalue(self._ptr, float(p)))
+        return self._fn_update_pvalue(self._ptr, p)
 
     def update_miscovered(self, miscovered: bool) -> float:
-        return float(self._lib.cloture_conformal_update_miscovered(self._ptr, 1 if miscovered else 0))
+        return self._fn_update_miscovered(self._ptr, 1 if miscovered else 0)
 
     @property
     def alpha_t(self) -> float:
-        return float(self._lib.cloture_conformal_alpha_t(self._ptr))
+        return self._lib.cloture_conformal_alpha_t(self._ptr)
 
     @property
     def empirical_coverage(self) -> float:
-        return float(self._lib.cloture_conformal_empirical_coverage(self._ptr))
+        return self._lib.cloture_conformal_empirical_coverage(self._ptr)
 
 
 def e_bh_discoveries(e_values: Sequence[float], alpha: float = 0.05) -> List[int]:

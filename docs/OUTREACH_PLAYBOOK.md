@@ -26,13 +26,13 @@ mcp-publisher publish
 ### B. This Week in Rust (`rust-lang/this-week-in-rust`) — High-Leverage Organic Rust Traffic
 Open a PR adding one line under **Crate of the Week / Updates from the Rust Community → Project/Tooling Updates** in the current draft markdown file:
 ```markdown
-- [cloture v0.1.0](https://github.com/pgg898200-ship-it/cloture) — zero-external-crate (`15`-line `Cargo.lock`) Rust engine, CLI, MCP server, Python SDK, and 215 KB zero-import WebAssembly playground for sub-microsecond anytime-valid multi-agent consensus stopping, correlated judge-panel `n_eff` auditing, sequential racing, and Active-PPI++.
+- [cloture v0.2.0](https://github.com/pgg898200-ship-it/cloture) — zero-external-crate (`15`-line `Cargo.lock`) Rust engine, CLI, MCP server, Python SDK, and 243 KB zero-import WebAssembly playground for sub-microsecond anytime-valid multi-agent consensus stopping (`668 ns`), correlated judge-panel `n_eff` auditing (`26 ms`, 55.7x vs NumPy/SciPy), sequential racing, and Active-PPI++.
 ```
 
 ### C. `punkpeye/awesome-mcp-servers` & `modelcontextprotocol/servers`
 Add under **Data Science / Evaluation / Developer Tools**:
 ```markdown
-- [pgg898200-ship-it/cloture](https://github.com/pgg898200-ship-it/cloture) 🦀 - Zero-dependency Rust MCP server (`2.47 MiB`, `76.7 µs` roundtrip) exposing 6 anytime-valid statistical tools for multi-agent consensus stopping (`ASC-D`/`CITE`), correlated LLM-as-a-judge panel `n_eff` auditing, sequential agent racing, Active-PPI++, and poisoning-resistant fusion.
+- [pgg898200-ship-it/cloture](https://github.com/pgg898200-ship-it/cloture) 🦀 - Zero-dependency Rust MCP server (`2.91 MiB`, `67.6 µs` roundtrip) exposing 6 anytime-valid statistical tools for multi-agent consensus stopping (`ASC-D`/`CITE`), correlated LLM-as-a-judge panel `n_eff` auditing, sequential agent racing, Active-PPI++, and poisoning-resistant fusion.
 ```
 
 ### D. `rust-unofficial/awesome-rust`
@@ -44,12 +44,12 @@ Add under **Science / Statistics**:
 ### E. `e2b-dev/awesome-ai-agents` & `kyrolabs/awesome-agents`
 Add under **Evaluation / Orchestration / Guardrails**:
 ```markdown
-- [cloture](https://github.com/pgg898200-ship-it/cloture) - Zero-dependency Rust/Python/WASM engine to stop parallel Best-of-N / multi-agent debates the millisecond finite-sample math certifies a winner (67%–92% fewer calls, 0% peeking blow-up) and audit correlated LLM-as-a-judge panels.
+- [cloture](https://github.com/pgg898200-ship-it/cloture) - Zero-dependency Rust/Python/WASM engine to stop parallel Best-of-N / multi-agent debates the millisecond finite-sample math certifies a winner (67%–92% fewer calls, 0% peeking blow-up) and audit correlated LLM-as-a-judge panels (pruning 11->3 on AllenAI RewardBench lifts accuracy +3.85 pp at -72.7% cost).
 ```
 
 ### F. Developer Newsletters (Direct Submission Forms)
-- **Python Weekly** (`pythonweekly.com` — submit `pip install cloture` + 26.5 ms cold start + 1-line `cloture.audit_csv()` + `await cloture.consensus()`).
-- **PyCoder's Weekly** (`pycoders.com/submissions` — highlight `2.21 µs` Rust-backed ctypes universal `py3-none` wheels with zero runtime dependencies).
+- **Python Weekly** (`pythonweekly.com` — submit `pip install cloture` + 24.8 ms cold start + 1-line `cloture.audit_csv()` / `audit_promptfoo()` + `await cloture.consensus()`).
+- **PyCoder's Weekly** (`pycoders.com/submissions` — highlight `16.0 ns` EB-CS & `668 ns` ASC-D Rust-backed ctypes universal `py3-none` wheels with zero runtime dependencies).
 - **Hacker Newsletter / TLDR AI** (automatically picks up high-signal Show HN launches).
 
 ---
@@ -58,10 +58,10 @@ Add under **Evaluation / Orchestration / Guardrails**:
 
 | Day | Channel | Angle & Hook |
 |---|---|---|
-| **Day 1 (Tue/Wed 9am ET)** | **Show HN** + **Lobste.rs** | Lead with the two concrete empirical surprises (`2.21 / 9` effective votes; `67%–92%` fewer calls with `0%` tie-null FPR vs `28.5%` peeking) + **Live 215 KB WASM Playground** link so HN readers can play in 2 seconds without installing anything. |
-| **Day 2** | **r/rust** | Engineering craft angle: 0 external crates (15-line `Cargo.lock`), `215 KB` zero-import WASM (`IMPORTS: []`), `panic="unwind"` FFI boundary, zero-transcendental Fan-inequality supermartingale, `712 B` monoid, `203` adversarial breaker tests. |
-| **Day 3** | **r/LocalLLaMA** & **r/MachineLearning** | Practical LLM cost & validity angle: stop Best-of-N early with logprobs (`ASC-D`), audit your judge CSV in 1 line (`cloture.audit_csv`) or privately in browser WASM, avoid `33%–40%` correlated-rollout eval false alarms. |
-| **Day 4** | **X / Twitter** + **Official MCP Registry** + **PRs (This Week in Rust, awesome-mcp-servers, awesome-rust)** | Post the 2 generated SVG benchmark visuals (`docs/assets/consensus_and_panel.svg` and `docs/assets/speed_and_validity.svg`) + 5-post empirical thread + Playground link. |
+| **Day 1 (Tue/Wed 9am ET)** | **Show HN** + **Lobste.rs** | Lead with the real AllenAI RewardBench `11 -> 3` (`+3.85 pp` accuracy at `-72.7%` API cost) + `67%–92%` fewer consensus calls with `0%` tie-null FPR + **Live 243 KB WASM Playground** link so HN readers can test in 2 seconds without installing anything. |
+| **Day 2** | **r/rust** | Engineering craft angle: 0 external crates (15-line `Cargo.lock`), `243 KB` zero-import WASM (`IMPORTS: []`), zero-libm Chebyshev kernels (`16 ns` EB-CS, `281 ns` BettingCS, `26 ms` parallel `PanelAudit`), `panic="unwind"` FFI boundary, `712 B` monoid, `282` tests. |
+| **Day 3** | **r/LocalLLaMA** & **r/MachineLearning** | Practical LLM cost & validity angle: real RewardBench 11-model judge collapse, `cloture audit --csv judges.csv`, `audit_promptfoo`, OpenAI logprobs `ASC-D` stopping, avoiding `33%–40%` correlated-rollout eval false alarms. |
+| **Day 4** | **X / Twitter** + **Official MCP Registry** + **PRs (This Week in Rust, awesome-mcp-servers, awesome-rust)** | Post the 3 generated SVG benchmark visuals (`docs/assets/rewardbench_real_world.svg`, `consensus_and_panel.svg`, `speed_and_validity.svg`) + 5-post empirical thread + Playground link. |
 
 ---
 

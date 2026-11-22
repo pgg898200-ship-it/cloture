@@ -82,8 +82,8 @@ def build_consensus_and_panel_svg(d: dict) -> str:
         "</defs>",
         f'<rect width="{W}" height="{H}" rx="14" fill="url(#bg)" stroke="#263147" stroke-width="1.5"/>',
         # Header
-        '<text x="28" y="34" fill="#e6edf7" font-family="ui-sans-serif,system-ui,-apple-system,sans-serif" font-size="16" font-weight="700">cloture v0.1.0 — Verified Empirical Receipts (benchmarks/results.json)</text>',
-        '<text x="952" y="34" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5">0 external crates · 0 Python runtime deps · 266/266 tests</text>',
+        '<text x="28" y="34" fill="#e6edf7" font-family="ui-sans-serif,system-ui,-apple-system,sans-serif" font-size="16" font-weight="700">cloture v0.2.0 — Verified Empirical Receipts (benchmarks/results.json)</text>',
+        '<text x="952" y="34" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5">0 external crates · 0 Python runtime deps · 282/282 tests</text>',
         '<line x1="28" y1="48" x2="952" y2="48" stroke="#223047" stroke-width="1"/>',
         # Left Card
         '<rect x="28" y="64" width="452" height="332" rx="10" fill="#131a26" stroke="#25324a" stroke-width="1"/>',
@@ -238,6 +238,116 @@ def build_speed_and_validity_svg(d: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def build_rewardbench_svg(rb: dict) -> str:
+    g7 = rb["generative_7_panel"]
+    pr = rb["frontier_11_pruning"]
+    traj = pr["trajectory"]
+    race = rb["paired_agent_race_6_models"]
+    ppi = rb["active_ppi_gpt4o_mini_to_gpt4o"]
+
+    W, H = 980, 410
+    lines = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="Real-world AllenAI RewardBench 2985-item frontier judge pruning and correlation collapse chart">',
+        "<defs>",
+        '  <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">',
+        '    <stop offset="0%" stop-color="#0d1117"/>',
+        '    <stop offset="100%" stop-color="#111827"/>',
+        "  </linearGradient>",
+        "</defs>",
+        f'<rect width="{W}" height="{H}" rx="14" fill="url(#bg3)" stroke="#263147" stroke-width="1.5"/>',
+        '<text x="28" y="34" fill="#e6edf7" font-family="ui-sans-serif,system-ui,-apple-system,sans-serif" font-size="16" font-weight="700">Real-World Frontier Audit: AllenAI RewardBench (2,985 Items, 23 Strata)</text>',
+        '<text x="952" y="34" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">source: allenai/reward-bench-results · zero synthetic data</text>',
+        '<line x1="28" y1="48" x2="952" y2="48" stroke="#223047" stroke-width="1"/>',
+        # Left card: Pruning trajectory 11 -> 3
+        '<rect x="28" y="64" width="465" height="322" rx="10" fill="#131a26" stroke="#25324a" stroke-width="1"/>',
+        '<text x="46" y="88" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="700">LOO Pruning 11 → 3 Real Frontier Models (+3.85 pp, -72.7% Cost)</text>',
+        '<text x="46" y="106" fill="#93a3bd" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11">11 models deliver only 2.73 effective votes; dropping 8 boosts accuracy to 95.88%</text>',
+    ]
+
+    # Plot trajectory line + points for K=11..3
+    px0, px1 = 76, 468
+    py0, py1 = 134, 300
+    min_acc, max_acc = 90.0, 97.0
+
+    def map_x(idx: int) -> float:
+        return px0 + (idx / max(1, len(traj) - 1)) * (px1 - px0)
+
+    def map_y(acc_pct: float) -> float:
+        return py1 - ((acc_pct - min_acc) / (max_acc - min_acc)) * (py1 - py0)
+
+    # Grid lines
+    for pct in (90, 92, 94, 96):
+        gy = map_y(float(pct))
+        lines.append(f'<line x1="{px0}" y1="{gy:.1f}" x2="{px1}" y2="{gy:.1f}" stroke="#1f2c40" stroke-width="1"/>')
+        lines.append(f'<text x="{px0-8}" y="{gy+4:.1f}" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10">{pct}%</text>')
+
+    # Best single judge reference line (94.97%)
+    bs_y = map_y(traj[0]["best_single_accuracy"] * 100.0)
+    lines.append(f'<line x1="{px0}" y1="{bs_y:.1f}" x2="{px1}" y2="{bs_y:.1f}" stroke="#f7b267" stroke-width="1.2" stroke-dasharray="4,3"/>')
+    lines.append(f'<text x="{px0+6}" y="{bs_y-5:.1f}" fill="#f7b267" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">Best single model (94.97%)</text>')
+
+    pts = []
+    for idx, step in enumerate(traj):
+        x = map_x(idx)
+        y = map_y(step["panel_accuracy"] * 100.0)
+        pts.append((x, y, step["k"], step["panel_accuracy"] * 100.0))
+
+    poly = " ".join(f"{x:.1f},{y:.1f}" for x, y, _, _ in pts)
+    lines.append(f'<polyline points="{poly}" fill="none" stroke="#38d9c0" stroke-width="2.6"/>')
+    for x, y, k_val, acc_v in pts:
+        r = 5.5 if k_val in (11, 3) else 3.8
+        fill = "#38d9c0" if k_val == 3 else ("#f87171" if k_val == 11 else "#7aa2f7")
+        lines.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r}" fill="{fill}" stroke="#0d1117" stroke-width="1.2"/>')
+        lines.append(f'<text x="{x:.1f}" y="{py1+18}" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10">K={k_val}</text>')
+
+    lines += [
+        f'<text x="{pts[0][0]+6:.1f}" y="{pts[0][1]+16:.1f}" fill="#f87171" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2" font-weight="700">92.03%</text>',
+        f'<text x="{pts[-1][0]-6:.1f}" y="{pts[-1][1]-10:.1f}" text-anchor="end" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11" font-weight="700">95.88% (-72.7% cost)</text>',
+        '<rect x="46" y="330" width="429" height="42" rx="7" fill="#152626" stroke="#255450" stroke-width="1"/>',
+        '<text x="58" y="347" fill="#38d9c0" font-family="ui-sans-serif,system-ui,sans-serif" font-size="10.5" font-weight="700">OPTIMAL PRUNED TRIAD (3 MODELS):</text>',
+        '<text x="58" y="363" fill="#e2e8f0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">GPT-4o (2024-08) + Skywork-Gemma-27B-RM + Skywork-Llama-8B-RM</text>',
+    ]
+
+    # Right card: Family correlation + Real AgentRace + Active-PPI++
+    lines += [
+        '<rect x="509" y="64" width="443" height="322" rx="10" fill="#131a26" stroke="#25324a" stroke-width="1"/>',
+        '<text x="527" y="88" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="700">Same-Family Error Correlation (φ) &amp; Real Eval Savings</text>',
+        f'<text x="527" y="106" fill="#93a3bd" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11">7 Generative LLMs → only {g7["n_eff_kish"]:.2f} effective votes (within-family φ={g7["mean_within_family_phi"]:.2f} vs cross={g7["mean_cross_family_phi"]:.2f})</text>',
+    ]
+
+    pair_bars = [
+        ("GPT-4o(08) ↔ GPT-4o(05)", g7["top_correlated_pairs"][0]["phi"], "#f87171", "same family"),
+        ("GPT-4o(08) ↔ GPT-4o-mini", g7["top_correlated_pairs"][1]["phi"], "#f87171", "same family"),
+        ("Llama-405B ↔ Llama-70B", g7["top_correlated_pairs"][3]["phi"], "#f7b267", "same family"),
+        ("Gemini-Flash ↔ Gemma-27B", g7["top_correlated_pairs"][4]["phi"], "#f7b267", "same family"),
+        ("Gemini-Flash ↔ Llama-70B", g7["lowest_correlated_pairs"][-1]["phi"], "#38d9c0", "cross family"),
+    ]
+    ry = 128
+    for lbl, phi_v, col, tag in pair_bars:
+        bw = (phi_v / 0.70) * 165.0
+        lines.append(f'<text x="527" y="{ry+10}" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10">{_esc(lbl)}</text>')
+        lines.append(f'<rect x="692" y="{ry}" width="165" height="12" rx="3.5" fill="#1e293b"/>')
+        lines.append(f'<rect x="692" y="{ry}" width="{bw:.1f}" height="12" rx="3.5" fill="{col}"/>')
+        lines.append(f'<text x="864" y="{ry+10}" fill="{col}" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2" font-weight="700">φ={phi_v:.2f}</text>')
+        ry += 26
+
+    # Bottom right 2 KPI boxes: Real AgentRace & Real Active-PPI++
+    lines += [
+        '<rect x="527" y="268" width="198" height="104" rx="8" fill="#172133" stroke="#2b3d59" stroke-width="1"/>',
+        f'<text x="541" y="298" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="22" font-weight="800">{race["pct_evals_saved"]:.1f}%</text>',
+        '<text x="541" y="317" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11.5" font-weight="700">Real AgentRace Savings</text>',
+        f'<text x="541" y="335" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">6 frontier LLMs · 50/50 exact</text>',
+        f'<text x="541" y="350" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">winner (3,513 vs 17,910 evals)</text>',
+        '<rect x="737" y="268" width="198" height="104" rx="8" fill="#172133" stroke="#2b3d59" stroke-width="1"/>',
+        f'<text x="751" y="298" fill="#7aa2f7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="22" font-weight="800">{ppi["mean_variance_reduction"]:.1f}×</text>',
+        '<text x="751" y="317" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11.5" font-weight="700">Active-PPI++ Var Red.</text>',
+        f'<text x="751" y="335" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">100% anytime cov (10% audit)</text>',
+        f'<text x="751" y="350" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">removes {ppi["naive_bias_pp"]:+.1f} pp proxy bias</text>',
+        "</svg>",
+    ]
+    return "\n".join(lines) + "\n"
+
+
 def main() -> int:
     data = json.loads(RESULTS_PATH.read_text(encoding="utf-8"))
     ASSETS_DIR.mkdir(parents=True, exist_ok=True)
@@ -245,7 +355,14 @@ def main() -> int:
     p2 = ASSETS_DIR / "speed_and_validity.svg"
     p1.write_text(build_consensus_and_panel_svg(data), encoding="utf-8")
     p2.write_text(build_speed_and_validity_svg(data), encoding="utf-8")
-    print(f"Generated {p1} ({p1.stat().st_size} B) and {p2} ({p2.stat().st_size} B)")
+    rb_path = ROOT / "benchmarks" / "rewardbench_receipts.json"
+    if rb_path.exists():
+        rb = json.loads(rb_path.read_text(encoding="utf-8"))
+        p3 = ASSETS_DIR / "rewardbench_real_world.svg"
+        p3.write_text(build_rewardbench_svg(rb), encoding="utf-8")
+        print(f"Generated {p1}, {p2}, and {p3}")
+    else:
+        print(f"Generated {p1} and {p2}")
     return 0
 
 

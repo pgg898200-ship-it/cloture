@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>cloture Playground — Real Rust Engine in WebAssembly (Zero Backend)</title>
-  <meta name="description" content="Interactive in-browser playground running real Rust cloture-core compiled to 215 KB zero-import WebAssembly: audit correlated LLM-as-a-judge panels (paste CSV), race ASC-D/CITE stopping vs naive peeking, and stress-test Active-PPI++ under adversarial judges." />
+  <meta name="description" content="Interactive in-browser playground running real Rust cloture-core compiled to 243 KB (81 KB gzipped) zero-import WebAssembly: audit real 2,985-item AllenAI RewardBench or your own CSV judge panel, race ASC-D/CITE stopping vs naive peeking, and stress-test Active-PPI++ under adversarial judges." />
   <style>
     :root {
       --bg: #0b0e14;
@@ -78,9 +78,10 @@
   <div class="wrap">
     <header>
       <div class="brand"><a href="./" style="color:inherit;"><span>cloture</span> playground</a></div>
-      <div id="wasm-status" class="badge">Loading 215 KB Rust WASM…</div>
+      <div id="wasm-status" class="badge">Loading 243 KB Rust WASM…</div>
       <nav>
         <a href="./">Overview</a>
+        <a href="docs/REAL_WORLD_EVAL.md">RewardBench</a>
         <a href="https://github.com/pgg898200-ship-it/cloture">GitHub</a>
         <a href="docs/benchmarks.md">Benchmarks</a>
         <a href="docs/integrations.md">Integrations</a>
@@ -89,7 +90,7 @@
     </header>
 
     <h1>Run Real Rust <code>cloture-core</code> Locally in Your Browser</h1>
-    <p class="sub">Zero backend, zero network upload — your data stays 100% on your machine inside a <code>215 KB</code> zero-import WebAssembly binary.</p>
+    <p class="sub">Zero backend, zero network upload — your data stays 100% on your machine inside a <code>243 KB</code> (<code>81 KB</code> gzipped) zero-import WebAssembly binary.</p>
 
     <div class="tabs">
       <button class="tab-btn active" data-tab="panel">1. Judge Panel Audit (or Paste CSV)</button>
@@ -112,6 +113,7 @@
           <input type="range" id="in-weak" min="0" max="6" value="3" />
           <div class="btn-row">
             <button class="primary" id="btn-run-panel">Run WASM Audit</button>
+            <button class="secondary" id="btn-preset-rewardbench" style="border-color:var(--accent);color:var(--accent);">Real RewardBench (11 LLMs × 2,985)</button>
             <button class="secondary" id="btn-preset-indep">Independent Judges</button>
             <button class="secondary" id="btn-preset-clones">Cloned Judges</button>
           </div>
@@ -469,13 +471,54 @@
     bindVal("in-bias", "lbl-bias", (v) => (Number(v) >= 0 ? "+" : "") + Number(v).toFixed(2));
     bindVal("in-ppi-n", "lbl-ppi-n");
 
-    document.getElementById("btn-run-panel").addEventListener("click", runSimulatedPanel);
+    async function runRealRewardBench() {
+      if (!cloture) return;
+      const btn = document.getElementById("btn-preset-rewardbench");
+      btn.textContent = "Loading 2,985 items…";
+      try {
+        const resp = await fetch("./benchmarks/rewardbench_receipts.json");
+        const rb = await resp.json();
+        const bin = atob(rb.playground_preset_b64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        const N = rb.n_items;
+        const K = rb.models.length;
+        const labels = rb.models.map((m) => m.name);
+        const votes = [];
+        const gold = new Array(N).fill(1);
+        let bitIdx = 0;
+        for (let i = 0; i < N; i++) {
+          const row = new Array(K);
+          for (let j = 0; j < K; j++) {
+            row[j] = (bytes[bitIdx >> 3] >> (bitIdx & 7)) & 1;
+            bitIdx++;
+          }
+          votes.push(row);
+        }
+        const t0 = performance.now();
+        const rep = cloture.auditPanel(votes, gold, { nCondorcetSims: 1000, nPerms: 1000, nBoot: 500, seed: 42 });
+        document.getElementById("panel-heading").textContent = "Live WASM Audit: Real AllenAI RewardBench (11 Frontier Models × 2,985 Items)";
+        renderPanelReport(rep, performance.now() - t0, labels);
+      } catch (e) {
+        alert("Failed to load real RewardBench preset: " + e);
+      } finally {
+        btn.textContent = "Real RewardBench (11 LLMs × 2,985)";
+      }
+    }
+
+    document.getElementById("btn-run-panel").addEventListener("click", () => {
+      document.getElementById("panel-heading").textContent = "Live Rust WASM Panel Audit Receipt";
+      runSimulatedPanel();
+    });
+    document.getElementById("btn-preset-rewardbench").addEventListener("click", runRealRewardBench);
     document.getElementById("btn-preset-indep").addEventListener("click", () => {
+      document.getElementById("panel-heading").textContent = "Live Rust WASM Panel Audit Receipt";
       document.getElementById("in-rho").value = 0; document.getElementById("lbl-rho").textContent = "0.00";
       document.getElementById("in-weak").value = 0; document.getElementById("lbl-weak").textContent = "0";
       runSimulatedPanel();
     });
     document.getElementById("btn-preset-clones").addEventListener("click", () => {
+      document.getElementById("panel-heading").textContent = "Live Rust WASM Panel Audit Receipt";
       document.getElementById("in-rho").value = 0.90; document.getElementById("lbl-rho").textContent = "0.90";
       document.getElementById("in-weak").value = 4; document.getElementById("lbl-weak").textContent = "4";
       runSimulatedPanel();

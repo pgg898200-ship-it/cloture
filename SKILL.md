@@ -18,8 +18,8 @@ Use `cloture` whenever a codebase runs **multiple agents, parallel LLM rollouts,
 | Task | Tool / API | Why |
 |---|---|---|
 | Stop Best-of-N / multi-agent voting over arbitrary answers (code, SQL, JSON) | `cloture.CiteStopper(delta=0.05)` or `await cloture.consensus(...)` | Category-agnostic anytime-valid certification (`Type-I <= delta`); cancels in-flight calls immediately |
-| Stop Best-of-N when LLM logprobs / answer distributions are available | `cloture.AscdStopper(k=4, delta=0.05)` | Grey-box `ASC-D` uses 46–95% fewer trajectories than label-only stopping |
-| Audit an LLM-as-a-judge or multi-agent panel for correlated errors | `cloture.audit_panel(votes, gold)` or `cloture audit --file panel.json` | Reports Kish & Eigenvalue `n_eff`, Condorcet gap, permutation p-value, and redundant agents to drop |
+| Stop Best-of-N when LLM logprobs / answer distributions are available | `cloture.AscdStopper(k=4, delta=0.05)` + `extract_openai_logprobs` | Grey-box `ASC-D` uses 46–95% fewer trajectories than label-only stopping (`668 ns/update`) |
+| Audit an LLM-as-a-judge or multi-agent panel for correlated errors | `cloture.audit_csv(...)`, `audit_promptfoo(...)`, `cloture audit --csv judges.csv` | Reports Kish & Eigenvalue `n_eff`, Condorcet gap, permutation p-value, and redundant agents to drop (`55.7x` faster than NumPy/SciPy) |
 | Certify deployment-level accuracy across prompts (not just one prompt) | `cloture.PopulationCert(delta=0.05)` | Prevents correlated single-unit misfires; computes optimal rollouts per prompt |
 | Race `M` candidate prompts, models, or agents | `cloture.AgentRace(n_arms=M, delta=0.05, paired=True)` | Anytime-valid FWER control + LUCB adaptive task allocation + Wang-Ramdas `e_bh_discoveries` |
 | Estimate true pass rate with 100% LLM judge + 10% human audits | `cloture.ActivePPI(alpha=0.05, target_audit_rate=0.10)` | Anytime-valid CS with online affine debiasing; auto-protects against biased or adversarial judges (`lambda -> 0`) |
@@ -34,7 +34,8 @@ Use `cloture` whenever a codebase runs **multiple agents, parallel LLM rollouts,
 cat rollouts.jsonl | cloture stop --mode cite --delta 0.05
 cat logprobs.jsonl | cloture stop --mode ascd --k 4 --delta 0.05
 
-# Audit a judge panel JSON ({"votes": [[...]], "gold": [...], "strata": [...]})
+# Audit any CSV or JSON judge panel directly (supports string labels, strata, and stdin "-")
+cloture audit --csv judges.csv --gold-col gold --strata-col subset --perms 2000
 cloture audit --file panel.json --perms 2000
 
 # Stream paired agent scores for sequential multi-arm winner certification

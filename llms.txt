@@ -1,6 +1,6 @@
 # cloture
 
-> Zero-dependency Rust core, single 2.47 MiB static CLI/MCP binary, C ABI, and zero-dependency Python SDK for sub-microsecond anytime-valid multi-agent consensus stopping, correlated-panel auditing, sequential agent racing, active prediction-powered evaluation (Active-PPI++), poisoning-resistant fusion, and 712-byte distributed evidence monoids.
+> Zero-dependency Rust core (`v0.2.0`), single 2.91 MiB static CLI/MCP binary, C ABI, 243 KB zero-import WebAssembly core, and zero-dependency Python SDK for sub-microsecond anytime-valid multi-agent consensus stopping, correlated-panel auditing, sequential agent racing, active prediction-powered evaluation (Active-PPI++), poisoning-resistant fusion, and 712-byte distributed evidence monoids.
 
 Use `cloture` when building multi-agent swarms, Best-of-N / self-consistency loops, LLM-as-a-judge evaluation panels, online A/B agent benchmarks, or live streaming safety gates where fixed-N sampling wastes 40%–92% of tokens/latency and naive peeking inflates false positives to 28%–54%.
 
@@ -9,11 +9,12 @@ Use `cloture` when building multi-agent swarms, Best-of-N / self-consistency loo
 - [README.md](README.md): Quickstart, 10-second Python/CLI/MCP examples, and verified head-to-head benchmark tables.
 - [llms-full.txt](llms-full.txt): Self-contained full technical reference, API signatures, CLI flags, MCP tools, and verified metrics.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): Exact non-asymptotic martingale, Kraft-IUT, Fan-inequality, CRC, and monoid proofs.
+- [docs/REAL_WORLD_EVAL.md](docs/REAL_WORLD_EVAL.md): Real-world evaluation on 2,985 AllenAI RewardBench items across 11 frontier models (LOO pruning 11->3 raises accuracy +3.85 pp at -72.7% cost; 80.4% AgentRace savings; 10.46x Active-PPI++ variance reduction).
 - [docs/benchmarks.md](docs/benchmarks.md): Full 7-suite head-to-head benchmark report against confseq, ppi-python, expectation, online-cp, bayesbench, and NumPy/SciPy.
 - [docs/comparisons.md](docs/comparisons.md): Factual feature matrix and guidance on when to use cloture vs. alternatives.
-- [docs/integrations.md](docs/integrations.md): Copy-paste drop-in recipes for OpenAI/vLLM logprobs, judge-panel audits, Claude Code/Cursor MCP, CI eval gates, and C FFI.
+- [docs/integrations.md](docs/integrations.md): Copy-paste drop-in recipes for OpenAI/vLLM logprobs, Promptfoo/CSV/JSONL judge-panel audits, Claude Code/Cursor MCP, CI eval gates, and C/WASM FFI.
 - [SKILL.md](SKILL.md): Agent skill routing table and statistical integrity rules.
 - [server.json](server.json): Official MCP Registry manifest (`io.github.pgg898200-ship-it/cloture`).
 - [include/cloture.h](include/cloture.h): Complete C ABI specification.
-- [benchmarks/results.json](benchmarks/results.json): Raw machine-verifiable JSON benchmark receipts.
-- Repository: https://github.com/pgg898200-ship-it/cloture | Docs: https://pgg898200-ship-it.github.io/cloture
+- [benchmarks/results.json](benchmarks/results.json) & [benchmarks/rewardbench_receipts.json](benchmarks/rewardbench_receipts.json): Raw machine-verifiable JSON benchmark receipts.
+- Repository: https://github.com/pgg898200-ship-it/cloture | Docs: https://pgg898200-ship-it.github.io/cloture/ | Live WASM Playground: https://pgg898200-ship-it.github.io/cloture/playground.html

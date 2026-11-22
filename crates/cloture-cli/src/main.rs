@@ -5,7 +5,7 @@
 mod json;
 mod mcp;
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::env;
 use std::fs;
 use std::io::{self, BufRead};
@@ -49,6 +49,7 @@ EXAMPLES:
     printf '42\\n42\\n42\\n42\\n42\\n42\\n42\\n42\\n42\\n42\\n' | cloture stop --mode cite --delta 0.05
     printf '[0.9,0.1]\\n[0.85,0.15]\\n[0.92,0.08]\\n' | cloture stop --mode ascd --k 2 --delta 0.05
     cloture audit --file panel.json
+    cloture audit --csv judges.csv --gold-col gold --strata-col difficulty
     cloture bench
     cloture mcp"
     );
@@ -355,8 +356,360 @@ fn cmd_stop(args: &[String]) -> i32 {
     }
 }
 
+struct ParsedPanelInput {
+    votes_flat: Vec<u32>,
+    gold: Vec<u32>,
+    n_items: usize,
+    k_judges: usize,
+    strata: Option<Vec<usize>>,
+    judge_names: Option<Vec<String>>,
+}
+
+/// Zero-dependency RFC-4180 CSV parser supporting optional quotes, escaped quotes (`""`),
+/// embedded commas/newlines inside quoted fields, CRLF/LF line endings, and leading UTF-8 BOM.
+fn parse_csv_records(raw: &str) -> Result<Vec<Vec<String>>, String> {
+    let input = raw.strip_prefix('\u{FEFF}').unwrap_or(raw);
+    let bytes = input.as_bytes();
+    let len = bytes.len();
+    let mut pos = 0usize;
+    let mut line_num = 1usize;
+    let mut records: Vec<Vec<String>> = Vec::new();
+
+    while pos < len {
+        // Skip blank lines (CRLF, LF, or whitespace-only lines) between records.
+        let mut scan = pos;
+        while scan < len && (bytes[scan] == b' ' || bytes[scan] == b'\t') {
+            scan += 1;
+        }
+        if scan == len {
+            break;
+        }
+        if bytes[scan] == b'\r' {
+            pos = scan + 1;
+            if pos < len && bytes[pos] == b'\n' {
+                pos += 1;
+            }
+            line_num += 1;
+            continue;
+        }
+        if bytes[scan] == b'\n' {
+            pos = scan + 1;
+            line_num += 1;
+            continue;
+        }
+
+        let row_start_line = line_num;
+        let mut row: Vec<String> = Vec::new();
+
+        loop {
+            if pos < len && bytes[pos] == b'"' {
+                // RFC-4180 quoted field.
+                pos += 1;
+                let mut field = String::new();
+                let mut seg_start = pos;
+                let mut closed = false;
+                while pos < len {
+                    if bytes[pos] == b'"' {
+                        field.push_str(&input[seg_start..pos]);
+                        if pos + 1 < len && bytes[pos + 1] == b'"' {
+                            field.push('"');
+                            pos += 2;
+                            seg_start = pos;
+                        } else {
+                            pos += 1;
+                            closed = true;
+                            break;
+                        }
+                    } else {
+                        if bytes[pos] == b'\n' {
+                            line_num += 1;
+                        }
+                        pos += 1;
+                    }
+                }
+                if !closed {
+                    return Err(format!(
+                        "CSV parse error: unterminated quoted field starting on line {}",
+                        row_start_line
+                    ));
+                }
+                if pos < len && !matches!(bytes[pos], b',' | b'\r' | b'\n') {
+                    return Err(format!(
+                        "CSV parse error: unexpected character after closing quote on line {}",
+                        line_num
+                    ));
+                }
+                row.push(field);
+            } else {
+                // Unquoted field: trim surrounding ASCII spaces/tabs while forbidding stray quotes.
+                let start = pos;
+                while pos < len {
+                    match bytes[pos] {
+                        b',' | b'\r' | b'\n' => break,
+                        b'"' => {
+                            return Err(format!(
+                                "CSV parse error: unexpected quote in unquoted field on line {}",
+                                line_num
+                            ));
+                        }
+                        _ => pos += 1,
+                    }
+                }
+                row.push(input[start..pos].trim().to_string());
+            }
+
+            if pos < len && bytes[pos] == b',' {
+                pos += 1;
+                continue;
+            }
+            if pos < len && bytes[pos] == b'\r' {
+                pos += 1;
+                if pos < len && bytes[pos] == b'\n' {
+                    pos += 1;
+                }
+                line_num += 1;
+            } else if pos < len && bytes[pos] == b'\n' {
+                pos += 1;
+                line_num += 1;
+            }
+            break;
+        }
+
+        records.push(row);
+    }
+
+    Ok(records)
+}
+
+fn intern_label(map: &mut HashMap<String, u32>, label: &str) -> Result<u32, String> {
+    if let Some(&id) = map.get(label) {
+        return Ok(id);
+    }
+    let next_id = u32::try_from(map.len()).map_err(|_| "Too many distinct labels (> u32::MAX)")?;
+    map.insert(label.to_string(), next_id);
+    Ok(next_id)
+}
+
+fn parse_csv_panel(
+    raw: &str,
+    gold_col: &str,
+    strata_col: Option<&str>,
+) -> Result<ParsedPanelInput, String> {
+    if gold_col.is_empty() {
+        return Err("--gold-col cannot be empty".to_string());
+    }
+    if let Some(sc) = strata_col {
+        if sc.is_empty() {
+            return Err("--strata-col cannot be empty".to_string());
+        }
+        if sc == gold_col {
+            return Err(format!(
+                "--gold-col and --strata-col must be distinct (both '{}')",
+                gold_col
+            ));
+        }
+    }
+
+    let records = parse_csv_records(raw)?;
+    if records.is_empty() {
+        return Err("CSV input is empty".to_string());
+    }
+
+    let header = &records[0];
+    let n_cols = header.len();
+    if n_cols < 2 {
+        return Err("CSV header must contain at least 2 columns (gold + >=1 judge)".to_string());
+    }
+
+    let mut gold_idx: Option<usize> = None;
+    for (idx, col) in header.iter().enumerate() {
+        if col == gold_col {
+            if gold_idx.is_some() {
+                return Err(format!("Duplicate gold column '{}' in CSV header", gold_col));
+            }
+            gold_idx = Some(idx);
+        }
+    }
+    let gold_idx = gold_idx.ok_or_else(|| {
+        format!(
+            "Gold column '{}' not found in CSV header (available: {})",
+            gold_col,
+            header.join(", ")
+        )
+    })?;
+
+    let strata_idx: Option<usize> = if let Some(sc) = strata_col {
+        let mut found: Option<usize> = None;
+        for (idx, col) in header.iter().enumerate() {
+            if col == sc {
+                if found.is_some() {
+                    return Err(format!("Duplicate strata column '{}' in CSV header", sc));
+                }
+                found = Some(idx);
+            }
+        }
+        let idx = found.ok_or_else(|| {
+            format!(
+                "Strata column '{}' not found in CSV header (available: {})",
+                sc,
+                header.join(", ")
+            )
+        })?;
+        Some(idx)
+    } else {
+        None
+    };
+
+    let mut judge_col_indices: Vec<usize> = Vec::with_capacity(n_cols);
+    let mut judge_names: Vec<String> = Vec::with_capacity(n_cols);
+    for (idx, col) in header.iter().enumerate() {
+        if idx == gold_idx || Some(idx) == strata_idx {
+            continue;
+        }
+        if col.is_empty() {
+            return Err(format!(
+                "CSV header contains an empty judge column name at column {}",
+                idx + 1
+            ));
+        }
+        judge_col_indices.push(idx);
+        judge_names.push(col.clone());
+    }
+    if judge_col_indices.is_empty() {
+        return Err(
+            "CSV must contain at least one judge column besides gold/strata".to_string(),
+        );
+    }
+
+    if records.len() < 2 {
+        return Err("CSV input has header row only and no data rows".to_string());
+    }
+
+    let n_items = records.len() - 1;
+    let k_judges = judge_col_indices.len();
+    let total_votes = n_items
+        .checked_mul(k_judges)
+        .ok_or_else(|| "CSV dimensions overflow usize".to_string())?;
+
+    let mut label_map: HashMap<String, u32> = HashMap::new();
+    let mut strata_map: HashMap<String, usize> = HashMap::new();
+    let mut votes_flat = Vec::with_capacity(total_votes);
+    let mut gold = Vec::with_capacity(n_items);
+    let mut strata = strata_idx.map(|_| Vec::with_capacity(n_items));
+
+    for (row_offset, row) in records[1..].iter().enumerate() {
+        if row.len() != n_cols {
+            return Err(format!(
+                "CSV data row {} has {} column(s), expected {} (matching header)",
+                row_offset + 2,
+                row.len(),
+                n_cols
+            ));
+        }
+        gold.push(intern_label(&mut label_map, &row[gold_idx])?);
+        for &j_col in &judge_col_indices {
+            votes_flat.push(intern_label(&mut label_map, &row[j_col])?);
+        }
+        if let (Some(s_col), Some(ref mut s_vec)) = (strata_idx, &mut strata) {
+            let s_val = &row[s_col];
+            let sid = if let Some(&existing) = strata_map.get(s_val) {
+                existing
+            } else {
+                let next_id = strata_map.len();
+                strata_map.insert(s_val.clone(), next_id);
+                next_id
+            };
+            s_vec.push(sid);
+        }
+    }
+
+    Ok(ParsedPanelInput {
+        votes_flat,
+        gold,
+        n_items,
+        k_judges,
+        strata,
+        judge_names: Some(judge_names),
+    })
+}
+
+fn parse_json_panel(raw: &str) -> Result<ParsedPanelInput, String> {
+    let doc = parse_json(raw).map_err(|e| format!("Invalid JSON input: {}", e))?;
+    let votes_rows = match doc.get("votes").and_then(|v| v.as_arr()) {
+        Some(v) if !v.is_empty() => v,
+        _ => return Err("Input JSON must contain non-empty 'votes' 2D array".to_string()),
+    };
+    let gold_arr = match doc.get("gold").and_then(|v| v.as_arr()) {
+        Some(v) if v.len() == votes_rows.len() => v,
+        _ => {
+            return Err(
+                "Input JSON must contain 'gold' array matching 'votes' rows".to_string(),
+            );
+        }
+    };
+    let n_items = gold_arr.len();
+    let k_judges = match votes_rows[0].as_arr() {
+        Some(r) if !r.is_empty() => r.len(),
+        _ => return Err("Each row of 'votes' must be a non-empty array".to_string()),
+    };
+    let mut votes_flat = Vec::with_capacity(n_items * k_judges);
+    for row in votes_rows {
+        let r = match row.as_arr() {
+            Some(a) if a.len() == k_judges => a,
+            _ => return Err("Inconsistent row length in 'votes'".to_string()),
+        };
+        for v in r {
+            let u = match v.as_u64() {
+                Some(u) if u <= u32::MAX as u64 => u as u32,
+                _ => return Err("All 'votes' entries must be integers in 0..=u32::MAX".to_string()),
+            };
+            votes_flat.push(u);
+        }
+    }
+    let mut gold = Vec::with_capacity(n_items);
+    for v in gold_arr {
+        let u = match v.as_u64() {
+            Some(u) if u <= u32::MAX as u64 => u as u32,
+            _ => return Err("All 'gold' entries must be integers in 0..=u32::MAX".to_string()),
+        };
+        gold.push(u);
+    }
+    let strata: Option<Vec<usize>> = if let Some(st_val) = doc.get("strata") {
+        let a = match st_val.as_arr() {
+            Some(a) if a.len() == n_items => a,
+            _ => return Err("'strata' must be an array matching 'gold' length".to_string()),
+        };
+        let mut s = Vec::with_capacity(n_items);
+        for v in a {
+            let u = match v.as_u64() {
+                Some(u) => u as usize,
+                None => {
+                    return Err("All 'strata' entries must be non-negative integers".to_string());
+                }
+            };
+            s.push(u);
+        }
+        Some(s)
+    } else {
+        None
+    };
+
+    Ok(ParsedPanelInput {
+        votes_flat,
+        gold,
+        n_items,
+        k_judges,
+        strata,
+        judge_names: None,
+    })
+}
+
 fn cmd_audit(args: &[String]) -> i32 {
     let mut file: Option<String> = None;
+    let mut csv: Option<String> = None;
+    let mut gold_col = String::from("gold");
+    let mut gold_col_explicit = false;
+    let mut strata_col: Option<String> = None;
     let mut n_perms: usize = 2000;
     let mut n_condorcet: usize = 2000;
     let mut n_boot: usize = 1000;
@@ -366,11 +719,44 @@ fn cmd_audit(args: &[String]) -> i32 {
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
-            "--file" | "-f" if i + 1 < args.len() => {
+            "--file" | "-f" => {
+                if i + 1 >= args.len() {
+                    eprintln!("Missing value for {}", args[i]);
+                    return 2;
+                }
                 file = Some(args[i + 1].clone());
                 i += 2;
             }
-            "--perms" if i + 1 < args.len() => {
+            "--csv" => {
+                if i + 1 >= args.len() {
+                    eprintln!("Missing value for --csv");
+                    return 2;
+                }
+                csv = Some(args[i + 1].clone());
+                i += 2;
+            }
+            "--gold-col" => {
+                if i + 1 >= args.len() {
+                    eprintln!("Missing value for --gold-col");
+                    return 2;
+                }
+                gold_col = args[i + 1].clone();
+                gold_col_explicit = true;
+                i += 2;
+            }
+            "--strata-col" => {
+                if i + 1 >= args.len() {
+                    eprintln!("Missing value for --strata-col");
+                    return 2;
+                }
+                strata_col = Some(args[i + 1].clone());
+                i += 2;
+            }
+            "--perms" => {
+                if i + 1 >= args.len() {
+                    eprintln!("Missing value for --perms");
+                    return 2;
+                }
                 n_perms = match args[i + 1].parse() {
                     Ok(v) if v <= 1_000_000 => v,
                     _ => {
@@ -380,7 +766,11 @@ fn cmd_audit(args: &[String]) -> i32 {
                 };
                 i += 2;
             }
-            "--condorcet" if i + 1 < args.len() => {
+            "--condorcet" => {
+                if i + 1 >= args.len() {
+                    eprintln!("Missing value for --condorcet");
+                    return 2;
+                }
                 n_condorcet = match args[i + 1].parse() {
                     Ok(v) if v <= 1_000_000 => v,
                     _ => {
@@ -390,7 +780,11 @@ fn cmd_audit(args: &[String]) -> i32 {
                 };
                 i += 2;
             }
-            "--boot" if i + 1 < args.len() => {
+            "--boot" => {
+                if i + 1 >= args.len() {
+                    eprintln!("Missing value for --boot");
+                    return 2;
+                }
                 n_boot = match args[i + 1].parse() {
                     Ok(v) if v <= 1_000_000 => v,
                     _ => {
@@ -400,7 +794,11 @@ fn cmd_audit(args: &[String]) -> i32 {
                 };
                 i += 2;
             }
-            "--seed" if i + 1 < args.len() => {
+            "--seed" => {
+                if i + 1 >= args.len() {
+                    eprintln!("Missing value for --seed");
+                    return 2;
+                }
                 seed = match args[i + 1].parse() {
                     Ok(v) => v,
                     Err(_) => {
@@ -416,7 +814,7 @@ fn cmd_audit(args: &[String]) -> i32 {
             }
             "-h" | "--help" => {
                 println!(
-                    "USAGE: cloture audit [--file panel.json] [--perms 2000] [--condorcet 2000] [--boot 1000] [--seed 42] [--json]"
+                    "USAGE:\n    cloture audit [--file panel.json] [--perms 2000] [--condorcet 2000] [--boot 1000] [--seed 42] [--json]\n    cloture audit --csv <path|-> [--gold-col gold] [--strata-col <col>] [--perms 2000] [--condorcet 2000] [--boot 1000] [--seed 42] [--json]"
                 );
                 return 0;
             }
@@ -427,109 +825,73 @@ fn cmd_audit(args: &[String]) -> i32 {
         }
     }
 
-    let raw = match file {
-        Some(path) => match fs::read_to_string(&path) {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("Failed to read {}: {}", path, e);
-                return 1;
-            }
-        },
-        None => {
+    if file.is_some() && csv.is_some() {
+        eprintln!("Cannot specify both --file and --csv");
+        return 2;
+    }
+    if (gold_col_explicit || strata_col.is_some()) && csv.is_none() {
+        eprintln!("--gold-col and --strata-col require --csv");
+        return 2;
+    }
+
+    let parsed = if let Some(csv_path) = csv {
+        let raw = if csv_path == "-" {
             let mut s = String::new();
             if let Err(e) = io::Read::read_to_string(&mut io::stdin(), &mut s) {
-                eprintln!("Failed to read stdin: {}", e);
-                return 1;
+                eprintln!("Failed to read CSV from stdin: {}", e);
+                return 2;
             }
             s
-        }
-    };
-
-    let doc = match parse_json(&raw) {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("Invalid JSON input: {}", e);
-            return 2;
-        }
-    };
-    let votes_rows = match doc.get("votes").and_then(|v| v.as_arr()) {
-        Some(v) if !v.is_empty() => v,
-        _ => {
-            eprintln!("Input JSON must contain non-empty 'votes' 2D array");
-            return 2;
-        }
-    };
-    let gold_arr = match doc.get("gold").and_then(|v| v.as_arr()) {
-        Some(v) if v.len() == votes_rows.len() => v,
-        _ => {
-            eprintln!("Input JSON must contain 'gold' array matching 'votes' rows");
-            return 2;
-        }
-    };
-    let n_items = gold_arr.len();
-    let k_judges = match votes_rows[0].as_arr() {
-        Some(r) if !r.is_empty() => r.len(),
-        _ => {
-            eprintln!("Each row of 'votes' must be a non-empty array");
-            return 2;
-        }
-    };
-    let mut votes_flat = Vec::with_capacity(n_items * k_judges);
-    for row in votes_rows {
-        let r = match row.as_arr() {
-            Some(a) if a.len() == k_judges => a,
-            _ => {
-                eprintln!("Inconsistent row length in 'votes'");
-                return 2;
-            }
-        };
-        for v in r {
-            let u = match v.as_u64() {
-                Some(u) if u <= u32::MAX as u64 => u as u32,
-                _ => {
-                    eprintln!("All 'votes' entries must be integers in 0..=u32::MAX");
+        } else {
+            match fs::read_to_string(&csv_path) {
+                Ok(s) => s,
+                Err(e) => {
+                    eprintln!("Failed to read CSV '{}': {}", csv_path, e);
                     return 2;
                 }
-            };
-            votes_flat.push(u);
-        }
-    }
-    let mut gold = Vec::with_capacity(n_items);
-    for v in gold_arr {
-        let u = match v.as_u64() {
-            Some(u) if u <= u32::MAX as u64 => u as u32,
-            _ => {
-                eprintln!("All 'gold' entries must be integers in 0..=u32::MAX");
-                return 2;
             }
         };
-        gold.push(u);
-    }
-    let strata: Option<Vec<usize>> = if let Some(st_val) = doc.get("strata") {
-        let a = match st_val.as_arr() {
-            Some(a) if a.len() == n_items => a,
-            _ => {
-                eprintln!("'strata' must be an array matching 'gold' length");
+        match parse_csv_panel(&raw, &gold_col, strata_col.as_deref()) {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("{}", e);
                 return 2;
             }
-        };
-        let mut s = Vec::with_capacity(n_items);
-        for v in a {
-            let u = match v.as_u64() {
-                Some(u) => u as usize,
-                None => {
-                    eprintln!("All 'strata' entries must be non-negative integers");
-                    return 2;
-                }
-            };
-            s.push(u);
         }
-        Some(s)
     } else {
-        None
+        let raw = match file {
+            Some(path) => match fs::read_to_string(&path) {
+                Ok(s) => s,
+                Err(e) => {
+                    eprintln!("Failed to read {}: {}", path, e);
+                    return 2;
+                }
+            },
+            None => {
+                let mut s = String::new();
+                if let Err(e) = io::Read::read_to_string(&mut io::stdin(), &mut s) {
+                    eprintln!("Failed to read stdin: {}", e);
+                    return 2;
+                }
+                s
+            }
+        };
+        match parse_json_panel(&raw) {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("{}", e);
+                return 2;
+            }
+        }
     };
 
-    let audit = match PanelAudit::from_votes(&votes_flat, &gold, n_items, k_judges, strata.as_deref()) {
+    let audit = match PanelAudit::from_votes(
+        &parsed.votes_flat,
+        &parsed.gold,
+        parsed.n_items,
+        parsed.k_judges,
+        parsed.strata.as_deref(),
+    ) {
         Ok(a) => a,
         Err(e) => {
             eprintln!("PanelAudit error: {}", e);
@@ -545,7 +907,14 @@ fn cmd_audit(args: &[String]) -> i32 {
     };
     let rep = audit.run_with_config(&cfg);
     if json_out {
-        println!("{}", mcp::panel_report_to_json(&rep).to_json_string());
+        let mut report_json = mcp::panel_report_to_json(&rep);
+        if let (Some(names), Json::Obj(ref mut map)) = (&parsed.judge_names, &mut report_json) {
+            map.insert(
+                "judge_names".to_string(),
+                Json::Arr(names.iter().map(|s| Json::Str(s.clone())).collect()),
+            );
+        }
+        println!("{}", report_json.to_json_string());
     } else {
         println!(
             "cloture panel audit  (K={} judges, N={} items)",
@@ -564,12 +933,16 @@ fn cmd_audit(args: &[String]) -> i32 {
             "  Mean Pairwise Error phi    : {:.3} +/- {:.3}  (asymptotic ceiling: {:.2})",
             rep.mean_phi, rep.std_phi, rep.asymptotic_ceiling
         );
+        let best_label = match &parsed.judge_names {
+            Some(names) => names[rep.best_single_index].clone(),
+            None => format!("J{}", rep.best_single_index),
+        };
         println!(
-            "  Panel vs Best Single Acc   : {:.2}% vs {:.2}% (lift {:+.2} pp, best=J{})",
+            "  Panel vs Best Single Acc   : {:.2}% vs {:.2}% (lift {:+.2} pp, best={})",
             rep.panel_accuracy * 100.0,
             rep.best_single_accuracy * 100.0,
             rep.panel_lift * 100.0,
-            rep.best_single_index
+            best_label
         );
         println!(
             "  Condorcet Independence Gap : {:+.2} pp  (predicted {:.2}% under independence)",
@@ -586,14 +959,51 @@ fn cmd_audit(args: &[String]) -> i32 {
             rep.unanimous_accuracy * 100.0,
             rep.all_wrong_rate * 100.0
         );
-        let redundant: Vec<usize> = rep
-            .loo_analysis
-            .iter()
-            .filter(|l| l.redundant)
-            .map(|l| l.judge_idx)
-            .collect();
-        println!("  Optimal Diverse Subset     : {:?}", rep.optimal_subset);
-        println!("  Redundant Judges (LOO)     : {:?}", redundant);
+        if let Some(names) = &parsed.judge_names {
+            let opt_names: Vec<&str> = rep
+                .optimal_subset
+                .iter()
+                .map(|&idx| names[idx].as_str())
+                .collect();
+            let prunable_names: Vec<&str> = rep
+                .loo_analysis
+                .iter()
+                .filter(|l| l.redundant)
+                .map(|l| names[l.judge_idx].as_str())
+                .collect();
+            println!("  Optimal Diverse Subset     : {}", opt_names.join(", "));
+            if prunable_names.is_empty() {
+                println!("  Prunable Judges (LOO)      : (none)");
+            } else {
+                println!(
+                    "  Prunable Judges (LOO)      : {}",
+                    prunable_names.join(", ")
+                );
+            }
+            println!("  Per-Judge LOO Diagnostics  :");
+            let name_w = names.iter().map(|s| s.len()).max().unwrap_or(8).clamp(8, 32);
+            for l in &rep.loo_analysis {
+                let tag = if l.redundant { "[PRUNABLE]" } else { "[KEEP]    " };
+                println!(
+                    "    {:<width$}  acc={:5.1}%  LOO dAcc={:+6.2} pp  dNeff={:+6.2}  {}",
+                    names[l.judge_idx],
+                    rep.judge_accuracies[l.judge_idx] * 100.0,
+                    l.delta_accuracy * 100.0,
+                    l.delta_n_eff,
+                    tag,
+                    width = name_w
+                );
+            }
+        } else {
+            let redundant: Vec<usize> = rep
+                .loo_analysis
+                .iter()
+                .filter(|l| l.redundant)
+                .map(|l| l.judge_idx)
+                .collect();
+            println!("  Optimal Diverse Subset     : {:?}", rep.optimal_subset);
+            println!("  Redundant Judges (LOO)     : {:?}", redundant);
+        }
     }
     0
 }
@@ -1056,3 +1466,108 @@ fn cmd_bench(args: &[String]) -> i32 {
     }
     0
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn csv_rfc4180_quotes_escapes_crlf_bom_and_newlines() {
+        let raw = "\u{FEFF}gold,\"gpt-4o\",\"claude,sonnet\",\"llama \"\"3\"\"\"\r\n\
+                   \"option, A\",\"option, A\",\"option \"\"B\"\"\",\"option\nC\"\r\n\
+                   \"option \"\"B\"\"\",\"option \"\"B\"\"\",\"option \"\"B\"\"\",\"option, A\"\r\n\r\n";
+        let recs = parse_csv_records(raw).unwrap();
+        assert_eq!(recs.len(), 3);
+        assert_eq!(recs[0], vec!["gold", "gpt-4o", "claude,sonnet", "llama \"3\""]);
+        assert_eq!(recs[1], vec!["option, A", "option, A", "option \"B\"", "option\nC"]);
+        assert_eq!(recs[2], vec!["option \"B\"", "option \"B\"", "option \"B\"", "option, A"]);
+
+        let parsed = parse_csv_panel(raw, "gold", None).unwrap();
+        assert_eq!(parsed.n_items, 2);
+        assert_eq!(parsed.k_judges, 3);
+        assert_eq!(
+            parsed.judge_names.as_deref(),
+            Some(&[
+                "gpt-4o".to_string(),
+                "claude,sonnet".to_string(),
+                "llama \"3\"".to_string()
+            ][..])
+        );
+        // Consistent label-to-u32 mapping: gpt-4o matches gold on both rows.
+        assert_eq!(parsed.votes_flat[0], parsed.gold[0]);
+        assert_eq!(parsed.votes_flat[3], parsed.gold[1]);
+        // claude,sonnet misses row 0 and matches row 1.
+        assert_ne!(parsed.votes_flat[1], parsed.gold[0]);
+        assert_eq!(parsed.votes_flat[4], parsed.gold[1]);
+    }
+
+    #[test]
+    fn csv_panel_string_labels_and_strata_mapping() {
+        let csv_str = "item_stratum,target,j_alpha,j_beta,j_clone\n\
+                       easy,yes,yes,yes,yes\n\
+                       easy,no,no,yes,no\n\
+                       hard,yes,no,yes,no\n\
+                       hard,no,yes,no,yes\n";
+        let parsed = parse_csv_panel(csv_str, "target", Some("item_stratum")).unwrap();
+        assert_eq!(parsed.n_items, 4);
+        assert_eq!(parsed.k_judges, 3);
+        assert_eq!(
+            parsed.judge_names,
+            Some(vec![
+                "j_alpha".to_string(),
+                "j_beta".to_string(),
+                "j_clone".to_string()
+            ])
+        );
+        assert_eq!(parsed.strata, Some(vec![0, 0, 1, 1]));
+
+        let rep = PanelAudit::from_votes(
+            &parsed.votes_flat,
+            &parsed.gold,
+            parsed.n_items,
+            parsed.k_judges,
+            parsed.strata.as_deref(),
+        )
+        .unwrap()
+        .run_with_config(&PanelAuditConfig {
+            n_condorcet_sims: 200,
+            n_permutations: 200,
+            n_bootstrap: 100,
+            seed: 42,
+            ..Default::default()
+        });
+        // j_alpha and j_clone are exact clones (phi == 1.0).
+        assert!((rep.phi_matrix[2] - 1.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn csv_panel_rejects_malformed_inputs_and_bad_flags_with_code_2() {
+        assert!(parse_csv_panel("", "gold", None).is_err());
+        assert!(parse_csv_panel("   \r\n\n", "gold", None).is_err());
+        assert!(parse_csv_panel("gold,j1,j2\n", "gold", None).is_err());
+        assert!(parse_csv_panel("label,j1,j2\nA,A,B\n", "gold", None).is_err());
+        assert!(parse_csv_panel("gold,j1\nA,A\n", "gold", Some("missing")).is_err());
+        assert!(parse_csv_panel("gold,strata\nA,easy\n", "gold", Some("strata")).is_err());
+        assert!(parse_csv_panel("gold,j1\nA,A\n", "gold", Some("gold")).is_err());
+        assert!(parse_csv_panel("gold,gold,j1\nA,A,A\n", "gold", None).is_err());
+        assert!(parse_csv_panel("gold,j1,j2\nA,A\n", "gold", None).is_err());
+        assert!(parse_csv_panel("gold,j1\n\"unterminated,A\n", "gold", None).is_err());
+        assert!(parse_csv_panel("gold,j1\nA\"bad,B\n", "gold", None).is_err());
+        assert!(parse_csv_panel("gold,j1\n\"A\"trailing,B\n", "gold", None).is_err());
+
+        // CLI flag validation returns exit code 2 without panicking.
+        let s = |v: &[&str]| v.iter().map(|x| x.to_string()).collect::<Vec<_>>();
+        assert_eq!(cmd_audit(&s(&["--csv"])), 2);
+        assert_eq!(cmd_audit(&s(&["--gold-col"])), 2);
+        assert_eq!(cmd_audit(&s(&["--strata-col"])), 2);
+        assert_eq!(cmd_audit(&s(&["--csv", "/nonexistent/does_not_exist.csv"])), 2);
+        assert_eq!(
+            cmd_audit(&s(&["--file", "a.json", "--csv", "b.csv"])),
+            2
+        );
+        assert_eq!(cmd_audit(&s(&["--gold-col", "label"])), 2);
+        assert_eq!(cmd_audit(&s(&["--strata-col", "diff"])), 2);
+        assert_eq!(cmd_audit(&s(&["--unknown-flag"])), 2);
+    }
+}
+
