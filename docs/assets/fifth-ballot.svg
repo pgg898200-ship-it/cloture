@@ -1,47 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="444" viewBox="0 0 1000 444" role="img" aria-labelledby="title desc">
-  <title id="title">The fifth ballot locks the tally</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 400" width="550" height="400" role="img" aria-labelledby="title desc">
+<title id="title">The fifth ballot locks the tally</title>
   <desc id="desc">A replay of seven JudgeBench votes in a fixed order. The first four votes are B, B, B, A. B leads 3 to 1 with three votes available, so continue. The fifth vote is B. B leads 4 to 1 with only two votes available, so stop. The last two votes are left unopened in the replay.</desc>
-  <defs>
-    <pattern id="rule" width="8" height="8" patternUnits="userSpaceOnUse">
-      <path d="M-2 2L2-2M0 8L8 0M6 10L10 6" fill="none" stroke="#bcb5a7" stroke-width="1"/>
-    </pattern>
-  </defs>
-  <rect width="1000" height="444" fill="#fff3d7"/>
-  <path d="M0 0H12V444H0z" fill="#ef543c"/>
-  <g fill="#171729" font-family="Arial, Helvetica, sans-serif">
-    <text x="48" y="43" font-size="15" font-weight="bold" letter-spacing="2">CLOTURE  /  JUDGEBENCH REPLAY</text>
-    <text x="950" y="43" text-anchor="end" font-size="15" font-weight="bold" letter-spacing="2">7-VOTE PANEL</text>
-    <path d="M48 58H952" stroke="#171729" stroke-width="2"/>
-    <text x="46" y="127" font-family="Georgia, 'Times New Roman', serif" font-size="62" font-weight="bold" letter-spacing="-2">The fifth ballot locks the tally.</text>
-    <g font-family="'Courier New', monospace" font-size="17" text-anchor="middle" font-weight="bold">
-      <text x="106" y="169">01</text><text x="236" y="169">02</text><text x="366" y="169">03</text>
-      <text x="496" y="169">04</text><text x="626" y="169">05</text><text x="756" y="169">06</text>
-      <text x="886" y="169">07</text>
-    </g>
-    <g stroke="#171729" stroke-width="2">
-      <path d="M48 182h116v90H48z M178 182h116v90H178z M308 182h116v90H308z M438 182h116v90H438z" fill="#fff3d7"/>
-      <path d="M568 182h116v90H568z" fill="#ef543c"/>
-      <path d="M698 182h116v90H698z M828 182h116v90H828z" fill="url(#rule)" stroke-dasharray="6 4"/>
-    </g>
-    <g font-family="Georgia, 'Times New Roman', serif" font-size="66" font-weight="bold" text-anchor="middle">
-      <text x="106" y="250">B</text><text x="236" y="250">B</text><text x="366" y="250">B</text>
-      <text x="496" y="250">A</text><text x="626" y="250" fill="#171729">B</text>
-    </g>
-    <path d="M48 293v8h506v-8 M568 293v8h116v-8 M698 293v8h246v-8" stroke="#171729" stroke-width="2" fill="none"/>
-    <g font-family="'Courier New', monospace" font-size="16" font-weight="bold">
-      <text x="301" y="324" text-anchor="middle">FIRST FOUR VOTES</text>
-      <text x="626" y="324" text-anchor="middle" fill="#171729">LOCK</text>
-      <text x="821" y="324" text-anchor="middle">TWO UNOPENED</text>
-    </g>
-    <path d="M48 344H952" stroke="#171729" stroke-width="2"/>
-    <path d="M497 359v62" stroke="#bcb5a7"/>
-    <g font-size="21" font-weight="bold">
-      <text x="48" y="377">After four · Continue</text>
-      <text x="524" y="377" fill="#171729">After five · Stop</text>
-    </g>
-    <g font-size="19">
-      <text x="48" y="407">B leads 3–1. Three votes remain.</text>
-      <text x="524" y="407">B leads 4–1. Two votes remain.</text>
-    </g>
-  </g>
+<rect width="550" height="400" fill="#FAFAFA"/>
+<text x="22" y="35" font-size="27" font-family="'Instrument Sans', Arial, sans-serif" fill="#141619" font-weight="650" text-anchor="start">The fifth ballot locks the tally</text>
+<text x="22" y="64" font-size="18" font-family="'Instrument Sans', Arial, sans-serif" fill="#555C65" font-weight="400" text-anchor="start">JudgeBench replay · seven-vote panel</text>
+<text x="50" y="102" font-size="18" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#555C65" font-weight="400" text-anchor="middle">1</text>
+<rect x="23" y="114" width="54" height="57" fill="#FAFAFA" stroke="#555C65" stroke-width="1.8"/>
+<text x="50" y="153" font-size="33" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#141619" font-weight="600" text-anchor="middle">B</text>
+<text x="122" y="102" font-size="18" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#555C65" font-weight="400" text-anchor="middle">2</text>
+<rect x="95" y="114" width="54" height="57" fill="#FAFAFA" stroke="#555C65" stroke-width="1.8"/>
+<text x="122" y="153" font-size="33" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#141619" font-weight="600" text-anchor="middle">B</text>
+<text x="194" y="102" font-size="18" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#555C65" font-weight="400" text-anchor="middle">3</text>
+<rect x="167" y="114" width="54" height="57" fill="#FAFAFA" stroke="#555C65" stroke-width="1.8"/>
+<text x="194" y="153" font-size="33" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#141619" font-weight="600" text-anchor="middle">B</text>
+<text x="266" y="102" font-size="18" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#555C65" font-weight="400" text-anchor="middle">4</text>
+<rect x="239" y="114" width="54" height="57" fill="#FAFAFA" stroke="#555C65" stroke-width="1.8"/>
+<text x="266" y="153" font-size="33" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#141619" font-weight="600" text-anchor="middle">A</text>
+<text x="338" y="102" font-size="18" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#555C65" font-weight="400" text-anchor="middle">5</text>
+<rect x="311" y="114" width="54" height="57" fill="#315BFF" stroke="#315BFF" stroke-width="1.8"/>
+<text x="338" y="153" font-size="33" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#FAFAFA" font-weight="600" text-anchor="middle">B</text>
+<text x="410" y="102" font-size="18" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#555C65" font-weight="400" text-anchor="middle">6</text>
+<rect x="383" y="114" width="54" height="57" fill="#FAFAFA" stroke="#555C65" stroke-width="1.8" stroke-dasharray="5 4"/>
+<text x="482" y="102" font-size="18" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', monospace" fill="#555C65" font-weight="400" text-anchor="middle">7</text>
+<rect x="455" y="114" width="54" height="57" fill="#FAFAFA" stroke="#555C65" stroke-width="1.8" stroke-dasharray="5 4"/>
+<line x1="23" y1="194" x2="528" y2="194" stroke="#DADDE1" stroke-width="1"/>
+<text x="23" y="225" font-size="19" font-family="'Instrument Sans', Arial, sans-serif" fill="#555C65" font-weight="400" text-anchor="start">After four</text>
+<text x="175" y="225" font-size="21" font-family="'Instrument Sans', Arial, sans-serif" fill="#141619" font-weight="400" text-anchor="start">B leads 3–1. Three votes remain.</text>
+<text x="175" y="254" font-size="20" font-family="'Instrument Sans', Arial, sans-serif" fill="#555C65" font-weight="650" text-anchor="start">Continue</text>
+<line x1="23" y1="273" x2="528" y2="273" stroke="#DADDE1" stroke-width="1"/>
+<text x="23" y="304" font-size="19" font-family="'Instrument Sans', Arial, sans-serif" fill="#555C65" font-weight="400" text-anchor="start">After five</text>
+<text x="175" y="304" font-size="21" font-family="'Instrument Sans', Arial, sans-serif" fill="#141619" font-weight="400" text-anchor="start">B leads 4–1. Two votes remain.</text>
+<text x="175" y="333" font-size="20" font-family="'Instrument Sans', Arial, sans-serif" fill="#315BFF" font-weight="650" text-anchor="start">Stop</text>
+<text x="23" y="375" font-size="19" font-family="'Instrument Sans', Arial, sans-serif" fill="#555C65" font-weight="400" text-anchor="start">The two dashed ballots stay unopened.</text>
 </svg>
