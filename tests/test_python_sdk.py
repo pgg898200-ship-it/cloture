@@ -339,3 +339,32 @@ def test_cli_and_mcp_server():
     assert mode_res["certified"] is True and mode_res["winner"] == 0
     panel_res = json.loads(lines[3]["result"]["content"][0]["text"])
     assert panel_res["k_judges"] == 3 and panel_res["n_items"] == 50
+
+
+def test_csv_and_jsonl_judge_adapters(tmp_path: Path):
+    csv_path = tmp_path / "judges.csv"
+    rows = ["gold,gpt4,claude,weak_clone\n"]
+    for i in range(40):
+        g = "pass" if i % 2 == 0 else "fail"
+        j1 = g if i < 34 else ("fail" if g == "pass" else "pass")
+        j2 = g if i % 5 != 0 else ("fail" if g == "pass" else "pass")
+        j3 = "fail" if i < 24 else "pass"
+        rows.append(f"{g},{j1},{j2},{j3}\n")
+    csv_path.write_text("".join(rows), encoding="utf-8")
+
+    csv_audit = cloture.audit_csv(csv_path, gold_col="gold", n_perms=200, n_condorcet_sims=200, n_boot=100)
+    assert csv_audit.judge_names == ["gpt4", "claude", "weak_clone"]
+    assert csv_audit.report.k_judges == 3 and csv_audit.report.n_items == 40
+    assert isinstance(csv_audit.prunable_judges(), list)
+
+    jsonl_path = tmp_path / "judges.jsonl"
+    jlines = []
+    for i in range(30):
+        v = "A" if i < 22 else "B"
+        jlines.append(json.dumps({"gold": "A", "judges": {"j1": v, "j2": v, "j3": v}}))
+    jsonl_path.write_text("\n".join(jlines) + "\n", encoding="utf-8")
+
+    jsonl_audit = cloture.audit_jsonl(jsonl_path, n_perms=200, n_condorcet_sims=200, n_boot=100)
+    assert jsonl_audit.judge_names == ["j1", "j2", "j3"]
+    assert abs(jsonl_audit.report.n_eff_kish - 1.0) < 1e-6
+

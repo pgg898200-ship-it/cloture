@@ -34,9 +34,9 @@ esac
 if [ -n "${CLOTURE_VERSION:-}" ]; then
   VERSION="$CLOTURE_VERSION"
 else
-  VERSION="$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)"
+  VERSION="$(curl -fsSI "https://github.com/$REPO/releases/latest" | tr -d '\r' | sed -n 's|^[Ll]ocation: .*/tag/\([^[:space:]]*\)$|\1|p' | head -n 1)"
   if [ -z "$VERSION" ]; then
-    echo "Could not determine latest release tag from GitHub API; set CLOTURE_VERSION=v0.1.0." >&2
+    echo "Could not determine latest release tag from GitHub; set CLOTURE_VERSION=v0.1.0." >&2
     exit 1
   fi
 fi

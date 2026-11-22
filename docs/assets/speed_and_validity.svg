@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 400" width="980" height="400" role="img" aria-label="cloture speedup vs PyPI libraries and anytime-valid Type-I error control chart">
+<defs>
+  <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#0d1117"/>
+    <stop offset="100%" stop-color="#111827"/>
+  </linearGradient>
+</defs>
+<rect width="980" height="400" rx="14" fill="url(#bg2)" stroke="#263147" stroke-width="1.5"/>
+<text x="28" y="34" fill="#e6edf7" font-family="ui-sans-serif,system-ui,-apple-system,sans-serif" font-size="16" font-weight="700">Head-to-Head Throughput &amp; Anytime Statistical Validity vs. Installed PyPI Packages</text>
+<text x="952" y="34" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">Xeon 2.3GHz · Python 3.12 · Rust 1.100</text>
+<line x1="28" y1="48" x2="952" y2="48" stroke="#223047" stroke-width="1"/>
+<rect x="28" y="64" width="470" height="312" rx="10" fill="#131a26" stroke="#25324a" stroke-width="1"/>
+<text x="46" y="88" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="700">Speedup vs. Real Competitors (log₁₀ scale)</text>
+<text x="46" y="105" fill="#93a3bd" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11">Measured against confseq, bayesbench, expectation, online-cp, NumPy/SciPy</text>
+<text x="46" y="138" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.3">AgentRace vs bayesbench</text>
+<rect x="224" y="128" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="224" y="128" width="179.2" height="13" rx="3.5" fill="#7aa2f7"/>
+<text x="416" y="138.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">11,112×</text>
+<text x="46" y="167" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.3">OnlineConformal vs online-cp</text>
+<rect x="224" y="157" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="224" y="157" width="153.6" height="13" rx="3.5" fill="#7aa2f7"/>
+<text x="416" y="167.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">2,930×</text>
+<text x="46" y="196" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.3">PairedEProcess vs bayesbench</text>
+<rect x="224" y="186" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="224" y="186" width="132.1" height="13" rx="3.5" fill="#7aa2f7"/>
+<text x="416" y="196.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">959×</text>
+<text x="46" y="225" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.3">EB-CS stream vs expectation</text>
+<rect x="224" y="215" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="224" y="215" width="103.7" height="13" rx="3.5" fill="#7aa2f7"/>
+<text x="416" y="225.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">219×</text>
+<text x="46" y="254" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.3">AscdStopper vs NumPy ref</text>
+<rect x="224" y="244" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="224" y="244" width="64.7" height="13" rx="3.5" fill="#7aa2f7"/>
+<text x="416" y="254.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">28.9×</text>
+<text x="46" y="283" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.3">BettingCS vs confseq hedged</text>
+<rect x="224" y="273" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="224" y="273" width="64.4" height="13" rx="3.5" fill="#7aa2f7"/>
+<text x="416" y="283.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">28.4×</text>
+<text x="46" y="312" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.3">PanelAudit vs NumPy/SciPy</text>
+<rect x="224" y="302" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="224" y="302" width="30.4" height="13" rx="3.5" fill="#7aa2f7"/>
+<text x="416" y="312.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">4.8×</text>
+<text x="46" y="341" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.3">EB-CS batch vs confseq C++</text>
+<rect x="224" y="331" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="224" y="331" width="26.7" height="13" rx="3.5" fill="#7aa2f7"/>
+<text x="416" y="341.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">4.0×</text>
+<rect x="514" y="64" width="438" height="312" rx="10" fill="#131a26" stroke="#25324a" stroke-width="1"/>
+<text x="532" y="88" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="700">False-Positive / Miscoverage Rate (α = 5%)</text>
+<text x="532" y="105" fill="#93a3bd" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11">Dashed line = 5% validity limit; bars to the right violate error control</text>
+<line x1="723.4" y1="120" x2="723.4" y2="356" stroke="#38d9c0" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.8"/>
+<text x="726.4" y="366" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">5% cap</text>
+<text x="532" y="138" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">cloture PopulationCert</text>
+<rect x="708" y="128" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="708" y="128" width="3.0" height="13" rx="3.5" fill="#38d9c0"/>
+<text x="900" y="138.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">0.7%</text>
+<text x="532" y="167" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">cloture EB-CS / BettingCS</text>
+<rect x="708" y="157" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="708" y="157" width="3.1" height="13" rx="3.5" fill="#38d9c0"/>
+<text x="900" y="167.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">1.0%</text>
+<text x="532" y="196" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">cloture ActivePPI (peeking)</text>
+<rect x="708" y="186" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="708" y="186" width="3.1" height="13" rx="3.5" fill="#38d9c0"/>
+<text x="900" y="196.5" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">1.0%</text>
+<text x="532" y="225" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">ppi-python (peeking /200)</text>
+<rect x="708" y="215" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="708" y="215" width="89.4" height="13" rx="3.5" fill="#f87171"/>
+<text x="900" y="225.5" fill="#f87171" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">29.0%</text>
+<text x="532" y="254" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">Pooled Z-test (ρ=0.60)</text>
+<rect x="708" y="244" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="708" y="244" width="101.8" height="13" rx="3.5" fill="#f87171"/>
+<text x="900" y="254.5" fill="#f87171" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">33.0%</text>
+<text x="532" y="283" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">Pooled EB-CS (ρ=0.60)</text>
+<rect x="708" y="273" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="708" y="273" width="123.3" height="13" rx="3.5" fill="#f87171"/>
+<text x="900" y="283.5" fill="#f87171" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">40.0%</text>
+<text x="532" y="312" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">bayesbench.compare (tie)</text>
+<rect x="708" y="302" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="708" y="302" width="123.3" height="13" rx="3.5" fill="#f87171"/>
+<text x="900" y="312.5" fill="#f87171" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">40.0%</text>
+<text x="532" y="341" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">Naive CLT Peeking</text>
+<rect x="708" y="331" width="185" height="13" rx="3.5" fill="#1e293b"/>
+<rect x="708" y="331" width="165.9" height="13" rx="3.5" fill="#ef4444"/>
+<text x="900" y="341.5" fill="#ef4444" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.5" font-weight="700">53.8%</text>
+</svg>

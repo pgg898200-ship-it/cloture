@@ -120,3 +120,32 @@ jobs:
           "$PY" examples/async_consensus_demo.py
           "$PY" examples/audit_judge_panel.py
           "$PY" examples/active_ppi_eval.py
+
+  wasm-and-js-sdk:
+    name: Zero-Import WebAssembly & Node.js SDK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust + wasm32 target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build stripped WASM and verify size <= 260 KB
+        env:
+          RUSTFLAGS: "-C strip=symbols -C opt-level=s"
+        run: |
+          cargo build --release -p cloture-core --target wasm32-unknown-unknown
+          mkdir -p site/wasm
+          cp target/wasm32-unknown-unknown/release/cloture_core.wasm site/wasm/cloture_core.wasm
+          SIZE=$(wc -c < site/wasm/cloture_core.wasm)
+          echo "WASM size: ${SIZE} bytes"
+          test "$SIZE" -le 266240
+
+      - name: Run Node.js WASM SDK test suite
+        run: node --test js/test.mjs

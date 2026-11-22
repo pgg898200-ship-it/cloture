@@ -1473,3 +1473,120 @@ pub unsafe extern "C" fn cloture_sketch_from_bytes(
     }))
     .unwrap_or(std::ptr::null_mut())
 }
+
+// ============================================================================
+// Portable Memory & Pointer-Out Helpers (WASM / Go / Node / Browser FFI)
+// ============================================================================
+
+const MAX_ALLOC_BYTES: usize = 64 * 1024 * 1024;
+
+#[no_mangle]
+pub unsafe extern "C" fn cloture_alloc(bytes: usize) -> *mut u8 {
+    if bytes == 0 || bytes > MAX_ALLOC_BYTES {
+        return std::ptr::null_mut();
+    }
+    catch_unwind(|| {
+        let layout = match std::alloc::Layout::from_size_align(bytes, 8) {
+            Ok(l) => l,
+            Err(_) => return std::ptr::null_mut(),
+        };
+        std::alloc::alloc_zeroed(layout)
+    })
+    .unwrap_or(std::ptr::null_mut())
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn cloture_dealloc(ptr: *mut u8, bytes: usize) {
+    if ptr.is_null() || bytes == 0 || bytes > MAX_ALLOC_BYTES {
+        return;
+    }
+    let _ = catch_unwind(AssertUnwindSafe(|| {
+        if let Ok(layout) = std::alloc::Layout::from_size_align(bytes, 8) {
+            std::alloc::dealloc(ptr, layout);
+        }
+    }));
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn cloture_ascd_update_into(
+    ptr: *mut AscdStopper,
+    probs: *const f64,
+    len: usize,
+    out: *mut ClotureModeResult,
+) -> i32 {
+    if ptr.is_null() || out.is_null() {
+        return -1;
+    }
+    *out = cloture_ascd_update(ptr, probs, len);
+    0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn cloture_cite_update_into(
+    ptr: *mut CiteStopper,
+    label_id: u64,
+    out: *mut ClotureModeResult,
+) -> i32 {
+    if ptr.is_null() || out.is_null() {
+        return -1;
+    }
+    *out = cloture_cite_update(ptr, label_id);
+    0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn cloture_pop_add_unit_into(
+    ptr: *mut PopulationCert,
+    scores: *const f64,
+    len: usize,
+    out: *mut CloturePopResult,
+) -> i32 {
+    if ptr.is_null() || out.is_null() {
+        return -1;
+    }
+    *out = cloture_pop_add_unit(ptr, scores, len);
+    0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn cloture_ebcs_update_into(
+    ptr: *mut EmpiricalBernsteinCS,
+    x: f64,
+    out: *mut ClotureCsResult,
+) -> i32 {
+    if ptr.is_null() || out.is_null() {
+        return -1;
+    }
+    *out = cloture_ebcs_update(ptr, x);
+    0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn cloture_betcs_update_into(
+    ptr: *mut BettingCS,
+    x: f64,
+    out: *mut ClotureCsResult,
+) -> i32 {
+    if ptr.is_null() || out.is_null() {
+        return -1;
+    }
+    *out = cloture_betcs_update(ptr, x);
+    0
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn cloture_ppi_observe_into(
+    ptr: *mut ActivePPI,
+    judge_pred: f64,
+    audited: i32,
+    gold_label: f64,
+    audit_prob: f64,
+    out: *mut CloturePpiResult,
+) -> i32 {
+    if ptr.is_null() || out.is_null() {
+        return -1;
+    }
+    *out = cloture_ppi_observe(ptr, judge_pred, audited, gold_label, audit_prob);
+    0
+}
+

@@ -262,7 +262,7 @@ def test_zero_external_crate_dependencies():
 
 def test_anonymization_no_leaked_private_identifiers():
     """Scan entire repo (excluding build/venv/cache and this audit regex) for private identifiers."""
-    skip_dirs = {".venv", ".wheel-venv", "dist", "build", "telemetry", "target", ".pytest_cache", "__pycache__", ".git"}
+    skip_dirs = {".venv", ".wheel-venv", "dist", "build", "telemetry", "target", "target-wasm", "wasm", ".pytest_cache", "__pycache__", ".git"}
     this_file = Path(__file__).resolve()
     banned = re.compile(
         r"/home/[A-Za-z0-9_.-]+|/Users/[A-Za-z0-9_.-]+|C:\\\\Users\\\\",

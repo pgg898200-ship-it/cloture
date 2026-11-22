@@ -1,14 +1,25 @@
 # `cloture`
 
+[![CI](https://github.com/pgg898200-ship-it/cloture/actions/workflows/ci.yml/badge.svg)](https://github.com/pgg898200-ship-it/cloture/actions/workflows/ci.yml)
+[![Live WASM Playground](https://img.shields.io/badge/Live_Playground-215KB_Rust_WASM-38d9c0)](https://pgg898200-ship-it.github.io/cloture/playground.html)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Zero External Crates](https://img.shields.io/badge/Rust_Deps-0_external_crates-brightgreen)](Cargo.lock)
+[![Zero Python Deps](https://img.shields.io/badge/Python_Runtime_Deps-0-brightgreen)](pyproject.toml)
+
 **End the multi-agent debate the millisecond the math proves who won — and catch when your judge panel is 2 correlated votes wearing 9 trench coats.**
 
-`cloture` is a zero-dependency Rust core (`cloture-core`) + single `2.47 MiB` static CLI/MCP binary (`cloture`) + zero-dependency Python SDK (`cloture`) + C ABI (`include/cloture.h`) for **sub-microsecond anytime-valid consensus stopping, correlated-panel auditing, sequential agent racing, active prediction-powered evaluation, poisoning-resistant fusion, and distributed `<1 KB` evidence monoids**.
+> **Try it now with zero install:** [**Live Browser Playground (`215 KB` zero-import Rust WebAssembly)**](https://pgg898200-ship-it.github.io/cloture/playground.html) — paste your own LLM-as-a-judge CSV privately (zero backend upload), run live Monte Carlo stopping races, or stress-test Active-PPI++ against adversarially inverted judges.
+
+`cloture` is a zero-dependency Rust core (`cloture-core`) + single `2.47 MiB` static CLI/MCP binary (`cloture`) + zero-dependency Python SDK (`cloture`) + `215 KB` zero-import WebAssembly JS/TS SDK (`js/cloture.mjs`) + C ABI (`include/cloture.h`) for **sub-microsecond anytime-valid consensus stopping, correlated-panel auditing, sequential agent racing, active prediction-powered evaluation, poisoning-resistant fusion, and distributed `<1 KB` evidence monoids**.
+
+![cloture consensus stopping and correlated judge-panel collapse](docs/assets/consensus_and_panel.svg)
 
 - **Zero external Rust crates** (`Cargo.lock` is 15 lines; `std` only).
 - **Zero Python runtime dependencies** (`import cloture` cold-starts in `26.5 ms` vs `253 ms` NumPy / `860 ms` SciPy / `2,131 ms` `ppi_py`).
+- **Zero-import `215 KB` WebAssembly (`73 KB` gzipped)** running in browsers, Node.js, Deno, Bun, and Cloudflare Workers (`js/cloture.mjs`).
 - **Exact finite-sample martingale & conformal guarantees** — valid at *every* data-dependent stopping time, with zero p-hacking and zero asymptotic small-sample approximations.
 - **Built-in JSON-RPC 2.0 MCP server** (`cloture mcp`, `76.7 µs` median tool roundtrip) and **one-command self-benchmark** (`cloture bench`).
-- **Battle-tested**: `266 / 266` tests passing (`55` Rust core + `8` Python/CLI/MCP integration + `203` independent adversarial statistical, FFI, and fuzzing breaker tests).
+- **Battle-tested across Linux, macOS, and Windows**: `266+` tests passing (`55` Rust core + Python/CLI/MCP integration + `203` independent adversarial statistical, FFI, and fuzzing breaker tests + Node.js WASM suite).
 
 ---
 
@@ -70,8 +81,12 @@ dec = stopper.update(probs)
 ```python
 import cloture
 
+# Direct 1-line audit of any Promptfoo / Braintrust / Inspect AI / pandas CSV export (zero pandas required!)
+res = cloture.audit_csv("judges.csv", gold_col="gold")
+print(f"{res.report.k_judges} judges -> {res.report.n_eff_kish:.2f} effective votes | prune: {res.prunable_judges()}")
+
+# Or pass integer vote matrices directly (N x K)
 report = cloture.audit_panel(votes, gold, n_perms=2000, n_condorcet_sims=2000, n_boot=1000)
-print(f"K={report.k_judges} judges -> {report.n_eff_kish:.2f} effective votes (95% CI [{report.n_eff_ci_low:.2f}, {report.n_eff_ci_high:.2f}])")
 print(f"Condorcet gap: {report.condorcet_gap*100:.1f} pp | permutation p={report.permutation_p_value:.5f}")
 ```
 
@@ -97,6 +112,8 @@ printf '[0.9,0.05,0.05]\n[0.88,0.07,0.05]\n' | ./target/release/cloture stop --m
 ---
 
 ## Verified Head-to-Head Benchmarks
+
+![cloture head-to-head throughput and statistical validity vs PyPI competitors](docs/assets/speed_and_validity.svg)
 
 All numbers below were measured live on `Intel Xeon @ 2.30 GHz (2 vCPU)`, Python `3.12.16`, Rust `1.100.0`, against real PyPI packages (`confseq==0.0.11`, `ppi-python==0.2.3`, `expectation==0.6.1`, `online-cp==0.4.0`, `bayesbench==0.4.0.dev0`, `numpy==1.26.4`, `scipy==1.15.3`). Full raw receipts live in [benchmarks/results.json](benchmarks/results.json); reproduce with `PYTHONPATH=python .venv/bin/python benchmarks/run_benchmarks.py`.
 

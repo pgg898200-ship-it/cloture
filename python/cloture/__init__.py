@@ -40,7 +40,13 @@ _ASYNC_EXPORTS = {
     "race_agents",
 }
 
-__all__ = sorted(_NATIVE_EXPORTS | _ASYNC_EXPORTS | {"__version__"})
+_ADAPTER_EXPORTS = {
+    "NamedPanelAudit",
+    "audit_csv",
+    "audit_jsonl",
+}
+
+__all__ = sorted(_NATIVE_EXPORTS | _ASYNC_EXPORTS | _ADAPTER_EXPORTS | {"__version__"})
 
 
 def __getattr__(name: str):
@@ -50,4 +56,7 @@ def __getattr__(name: str):
     if name in _ASYNC_EXPORTS:
         from . import async_tools
         return getattr(async_tools, name)
+    if name in _ADAPTER_EXPORTS:
+        from . import adapters
+        return getattr(adapters, name)
     raise AttributeError(f"module 'cloture' has no attribute {name!r}")

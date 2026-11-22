@@ -175,9 +175,46 @@ jobs:
           name: assets-windows
           path: release-assets/*
 
+  build-wasm:
+    name: Zero-Import WebAssembly & JS/TS SDK (wasm32)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine release version tag
+        id: meta
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Install Rust + wasm32 target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build stripped WASM & package JS/TS SDK
+        env:
+          RUSTFLAGS: "-C strip=symbols -C opt-level=s"
+        run: |
+          cargo build --release -p cloture-core --target wasm32-unknown-unknown
+          mkdir -p site/wasm release-assets stage
+          cp target/wasm32-unknown-unknown/release/cloture_core.wasm site/wasm/cloture_core.wasm
+          node --test js/test.mjs
+          cp site/wasm/cloture_core.wasm js/cloture.mjs js/cloture.d.ts js/package.json LICENSE NOTICE stage/
+          tar -C stage -czf "release-assets/cloture-${{ steps.meta.outputs.tag }}-wasm32.tar.gz" .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: assets-wasm
+          path: release-assets/*
+
   github-release:
     name: Publish GitHub Release & SHA256SUMS
-    needs: [build-linux, build-macos, build-windows]
+    needs: [build-linux, build-macos, build-windows, build-wasm]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -257,6 +257,16 @@ size_t cloture_sketch_serialized_len(const ClotureSketch *ptr);
 size_t cloture_sketch_to_bytes(const ClotureSketch *ptr, uint8_t *buf, size_t cap);
 ClotureSketch *cloture_sketch_from_bytes(const uint8_t *buf, size_t len);
 
+/* ---- Portable Memory & Pointer-Out Helpers (WASM / Go / Node / Browser) ---- */
+uint8_t *cloture_alloc(size_t bytes);
+void cloture_dealloc(uint8_t *ptr, size_t bytes);
+int32_t cloture_ascd_update_into(ClotureAscd *ptr, const double *probs, size_t len, ClotureModeResult *out);
+int32_t cloture_cite_update_into(ClotureCite *ptr, uint64_t label_id, ClotureModeResult *out);
+int32_t cloture_pop_add_unit_into(CloturePopCert *ptr, const double *scores, size_t len, CloturePopResult *out);
+int32_t cloture_ebcs_update_into(ClotureEbCs *ptr, double x, ClotureCsResult *out);
+int32_t cloture_betcs_update_into(ClotureBetCs *ptr, double x, ClotureCsResult *out);
+int32_t cloture_ppi_observe_into(CloturePpi *ptr, double judge_pred, int32_t audited, double gold_label, double audit_prob, CloturePpiResult *out);
+
 #ifdef __cplusplus
 }
 #endif

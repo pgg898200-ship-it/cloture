@@ -1,0 +1,40 @@
+{
+  "name": "cloture-wasm",
+  "version": "0.1.0",
+  "description": "Zero-dependency WebAssembly engine for anytime-valid multi-agent consensus stopping, correlated judge-panel auditing, sequential racing, and Active-PPI++.",
+  "type": "module",
+  "main": "./cloture.mjs",
+  "types": "./cloture.d.ts",
+  "exports": {
+    ".": {
+      "import": "./cloture.mjs",
+      "types": "./cloture.d.ts"
+    }
+  },
+  "files": [
+    "cloture.mjs",
+    "cloture.d.ts",
+    "cloture_core.wasm"
+  ],
+  "scripts": {
+    "test": "node --test test.mjs"
+  },
+  "keywords": [
+    "ai-agents",
+    "multi-agent",
+    "llm-evaluation",
+    "anytime-valid",
+    "e-values",
+    "wasm",
+    "rust",
+    "conformal-prediction",
+    "prediction-powered-inference"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pgg898200-ship-it/cloture.git",
+    "directory": "js"
+  },
+  "homepage": "https://pgg898200-ship-it.github.io/cloture/"
+}
