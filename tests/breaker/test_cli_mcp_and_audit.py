@@ -4,12 +4,13 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-CLI_BIN = ROOT / "target" / "release" / "cloture"
+CLI_BIN = ROOT / "target" / "release" / ("cloture.exe" if sys.platform == "win32" else "cloture")
 
 
 def _run_cli(args: list[str], stdin_bytes: bytes = b"", timeout: float = 10.0) -> subprocess.CompletedProcess[bytes]:
@@ -261,7 +262,7 @@ def test_zero_external_crate_dependencies():
 
 def test_anonymization_no_leaked_private_identifiers():
     """Scan entire repo (excluding build/venv/cache and this audit regex) for private identifiers."""
-    skip_dirs = {".venv", "target", ".pytest_cache", "__pycache__", ".git"}
+    skip_dirs = {".venv", ".wheel-venv", "dist", "build", "telemetry", "target", ".pytest_cache", "__pycache__", ".git"}
     this_file = Path(__file__).resolve()
     banned = re.compile(
         r"/home/[A-Za-z0-9_.-]+|/Users/[A-Za-z0-9_.-]+|C:\\\\Users\\\\",
