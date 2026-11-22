@@ -1,32 +1,40 @@
-# `cloture`
+# Cloture
 
-[![CI](https://github.com/pgg898200-ship-it/cloture/actions/workflows/ci.yml/badge.svg)](https://github.com/pgg898200-ship-it/cloture/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/cloture?color=38d9c0)](https://pypi.org/project/cloture/)
-[![Live WASM Playground](https://img.shields.io/badge/Live_Playground-243KB_Rust_WASM-38d9c0)](https://pgg898200-ship-it.github.io/cloture/playground.html)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pgg898200-ship-it/cloture/blob/main/examples/cloture_frontier_eval_colab.ipynb)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Zero External Crates](https://img.shields.io/badge/Rust_Deps-0_external_crates-brightgreen)](Cargo.lock)
-[![Zero Python Deps](https://img.shields.io/badge/Python_Runtime_Deps-0-brightgreen)](pyproject.toml)
+**Stop requesting votes when the remaining judges cannot change the winner.** Cloture fits between the model calls in an evaluation runner and the code that tallies the answers. Give each answer a stable label and update the tally as each vote arrives. The runner can then decide whether to launch another call.
 
-**End the multi-agent debate the millisecond the math proves who won — and catch when your judge panel is 2 correlated votes wearing 9 trench coats.**
+[Try a judge panel in your browser](https://pgg898200-ship-it.github.io/cloture/playground.html) · [Run the Colab notebook](https://colab.research.google.com/github/pgg898200-ship-it/cloture/blob/main/examples/cloture_frontier_eval_colab.ipynb) · [Python package](https://pypi.org/project/cloture/) · [Agent reference](llms.txt)
 
-> **Try it now with zero install:** [**Live Browser Playground (`243 KB` / `81 KB` gzipped zero-import Rust WebAssembly)**](https://pgg898200-ship-it.github.io/cloture/playground.html) — load real **AllenAI RewardBench (11 LLMs × 2,985)** or **ScalerLab JudgeBench (13 LLMs × 350 incl. `o1-preview` & `Claude-3.5-Sonnet`)** in 1 click, paste your own CSV privately, or launch the [**15-Second Google Colab Walkthrough**](https://colab.research.google.com/github/pgg898200-ship-it/cloture/blob/main/examples/cloture_frontier_eval_colab.ipynb).
+## Try a seven-vote review
 
-`cloture` is a zero-dependency Rust core (`cloture-core`) + single `2.91 MiB` static CLI/MCP binary (`cloture`) + zero-dependency Python SDK (`cloture`) + `243 KB` zero-import WebAssembly JS/TS SDK (`js/cloture.mjs`) + C ABI (`include/cloture.h`) for **sub-microsecond anytime-valid consensus stopping, correlated-panel auditing, sequential agent racing, active prediction-powered evaluation, poisoning-resistant fusion, and distributed `<1 KB` evidence monoids**.
+Suppose an evaluator can ask up to seven judges to choose a patch. After five votes, patch A leads 4–1. Even two more votes for B would leave A ahead, so the runner can skip the last two calls. Replay that tally locally with the Python wheel.
 
-![Real-world AllenAI RewardBench frontier judge collapse, LOO pruning, and paired racing](docs/assets/rewardbench_real_world.svg)
-![Real-world ScalerLab JudgeBench 13-model pruning and Top-7 cross-family error correlation heatmap](docs/assets/judgebench_real_world.svg)
+```sh
+python -m pip install cloture
+```
 
-- **Zero external Rust crates** (`Cargo.lock` is 15 lines; `std` only).
-- **Zero Python runtime dependencies** (`import cloture` cold-starts in `24.8 ms` vs `201 ms` NumPy / `849 ms` SciPy / `2,075 ms` `ppi_py`).
-- **Zero-import `243 KB` WebAssembly (`81 KB` gzipped)** running in browsers, Node.js, Deno, Bun, and Cloudflare Workers (`js/cloture.mjs`).
-- **Frontier-beating speed across both batch & streaming:** `16.0 ns/step` EB-CS batch (**`25.7×` faster than `confseq` C++**, **`1.10×` faster than `expectation` offline batch**, **`297×` faster than `expectation` in Python streaming**), `330 ns` BettingCS (**`415×` faster than `confseq.hedged_cs`**), `26.0 ms` `9×1,000` PanelAudit (**`55.7×` faster than NumPy/SciPy**), `668 ns` `AscdStopper` (**`85.5×` faster than NumPy**), `11,276×` faster paired racing than `bayesbench`, and `3,294×` faster online conformal than `online-cp`.
-- **Built-in JSON-RPC 2.0 MCP server** (`cloture mcp`, `67.6 µs` median roundtrip), native `--csv` auditing (`cloture audit --csv`), and **one-command self-benchmark** (`cloture bench`).
-- **Battle-tested across Linux, macOS, Windows & WebAssembly:** **`282 / 282` tests passing** (`65` Rust core + `3` Rust CLI + `213` Python/CLI/MCP/adversarial breaker + Node.js WASM suite).
+```python
+from cloture import CiteStopper
 
----
+patches = ["patch A", "patch B"]
+votes = [0, 1, 0, 0, 0, 1, 1]
+stopper = CiteStopper(max_budget=7)
+for vote in votes:
+    decision = stopper.update(vote)
+    if decision.deterministic_lock:
+        print(f"{patches[decision.winner]} locked after {decision.n_samples}/7 votes")
+        break
+```
 
-## Real-World Frontier Receipts: RewardBench (`2,985` Items) & JudgeBench (`350` Objective Items)
+The output is `patch A locked after 5/7 votes`. In a live runner, call `update` after each response and check `deterministic_lock` before sending the next request. This lock counts votes and also works with correlated judges. It guarantees the outcome of the final tally. Correctness of the answer requires a separate evaluation.
+
+For **self-consistency sampling** on one prompt, `CiteStopper` also offers a statistical stopping rule. With independent draws from a fixed answer distribution with a unique most probable label, `delta` bounds the probability of ever certifying a wrong mode through that rule. The returned `scope` identifies the kind of decision. For **LLM-as-a-judge panels**, use `audit_panel` on labeled examples to measure agreement in judges’ errors and evaluate which judges to keep.
+
+[Async model-call integration](docs/integrations.md) · [Stopping assumptions](docs/ARCHITECTURE.md) · [Judge-panel evaluation](docs/REAL_WORLD_EVAL.md)
+
+
+## How many independent votes does a judge panel provide?
+
+![Effective vote counts and measured accuracy on RewardBench](docs/assets/rewardbench_real_world.svg)
 
 Evaluated directly on official public verdicts from [`allenai/reward-bench-results`](https://huggingface.co/datasets/allenai/reward-bench-results) and [`ScalerLab/JudgeBench`](https://github.com/ScalerLab/JudgeBench) with **zero synthetic data** and **strict 5-fold out-of-sample cross-validation** (full report: [`docs/REAL_WORLD_EVAL.md`](docs/REAL_WORLD_EVAL.md)):
 
@@ -41,7 +49,7 @@ Evaluated directly on official public verdicts from [`allenai/reward-bench-resul
 
 ---
 
-## 10-Second Quickstart
+## CLI, asynchronous sampling and panel audits
 
 ### Install
 
@@ -72,7 +80,10 @@ result = await cloture.consensus(
     max_calls=32,
     concurrency=8,
 )
-print(result.winner, f"certified in {result.n_samples}/32 calls (cancelled {result.n_cancelled} in-flight)")
+if result.certified:
+    print(result.winner, result.scope, result.n_samples)
+else:
+    print("Budget exhausted without a certificate", result.leader)
 
 # Grey-box ASC-D: pass OpenAI/vLLM logprobs for 40%–92% fewer trajectories
 probs = cloture.extract_openai_logprobs(chat_completion, ["A", "B", "C", "D"])

@@ -1,8 +1,8 @@
-# cloture
+# Cloture
 
-> Zero-dependency Rust core (`v0.2.0`), single 2.91 MiB static CLI/MCP binary, C ABI, 243 KB zero-import WebAssembly core, and zero-dependency Python SDK for sub-microsecond anytime-valid multi-agent consensus stopping, correlated-panel auditing, sequential agent racing, active prediction-powered evaluation (Active-PPI++), poisoning-resistant fusion, and 712-byte distributed evidence monoids.
+> Python and Rust tools for early stopping in model evaluation and for auditing LLM judge panels.
 
-Use `cloture` when building multi-agent swarms, Best-of-N / self-consistency loops, LLM-as-a-judge evaluation panels, online A/B agent benchmarks, or live streaming safety gates where fixed-N sampling wastes 40%–92% of tokens/latency and naive peeking inflates false positives to 28%–54%.
+For a fixed budget of unweighted votes, create `stopper = CiteStopper(max_budget=N)`. Call `stopper.update(label_id)` with an integer answer label after each vote. A `deterministic_lock` means the remaining ballots cannot overturn the leading count. For the separate statistical rule, independent draws from a fixed distribution with a unique mode allow `delta` to bound false mode certification. To study shared errors across judges, pass an item-by-judge vote matrix and gold labels to `audit_panel`.
 
 ## Documentation
 
