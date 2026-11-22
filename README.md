@@ -1,12 +1,14 @@
 # Cloture
 
-**Stop requesting votes when the remaining judges cannot change the winner.** Cloture fits between the model calls in an evaluation runner and the code that tallies the answers. Give each answer a stable label and update the tally as each vote arrives. The runner can then decide whether to launch another call.
+Cloture helps an evaluation runner decide whether to ask for another model response. For a panel with a fixed vote budget, give each answer a stable integer label and call `CiteStopper.update` after each vote. Once the leader’s margin exceeds the number of votes left, the final tally is settled. In a sequential runner, you can skip the remaining calls.
 
-[Try a judge panel in your browser](https://pgg898200-ship-it.github.io/cloture/playground.html) · [Run the Colab notebook](https://colab.research.google.com/github/pgg898200-ship-it/cloture/blob/main/examples/cloture_frontier_eval_colab.ipynb) · [Python package](https://pypi.org/project/cloture/) · [Agent reference](llms.txt)
+[Try the judge-panel playground](https://pgg898200-ship-it.github.io/cloture/playground.html) · [Run the Colab notebook](https://colab.research.google.com/github/pgg898200-ship-it/cloture/blob/main/examples/cloture_frontier_eval_colab.ipynb) · [Python package](https://pypi.org/project/cloture/) · [Agent reference](llms.txt)
 
-## Try a seven-vote review
+## Replay seven recorded judge votes
 
-Suppose an evaluator can ask up to seven judges to choose a patch. After five votes, patch A leads 4–1. Even two more votes for B would leave A ahead, so the runner can skip the last two calls. Replay that tally locally with the Python wheel.
+![The first four votes are B, B, B, A. B leads 3–1 with three votes left. After a fifth vote for B, it leads 4–1 with two left, so the runner can stop.](docs/assets/fifth-ballot.svg)
+
+Seven judges chose between responses A and B on one JudgeBench item. The first four votes in this replay leave A a path to a 4–3 win. The fifth vote gives B a lead that the last two judges cannot overturn. Replay the recorded votes with the Python package.
 
 ```sh
 python -m pip install cloture
@@ -15,19 +17,21 @@ python -m pip install cloture
 ```python
 from cloture import CiteStopper
 
-patches = ["patch A", "patch B"]
-votes = [0, 1, 0, 0, 0, 1, 1]
-stopper = CiteStopper(max_budget=7)
+labels = ("A", "B")
+votes = [1, 1, 1, 0, 1, 1, 1]
+stopper = CiteStopper(max_budget=len(votes))
 for vote in votes:
     decision = stopper.update(vote)
     if decision.deterministic_lock:
-        print(f"{patches[decision.winner]} locked after {decision.n_samples}/7 votes")
+        print(f"{labels[decision.winner]} locked after {decision.n_samples}/7 votes")
         break
 ```
 
-The output is `patch A locked after 5/7 votes`. In a live runner, call `update` after each response and check `deterministic_lock` before sending the next request. This lock counts votes and also works with correlated judges. It guarantees the outcome of the final tally. Correctness of the answer requires a separate evaluation.
+The output is `B locked after 5/7 votes`. All seven recorded votes gave B a 6–1 win. JudgeBench’s gold label for this item is **A**. The lock guarantees the winner of the fixed tally, even when judges make the same mistake. If you run calls concurrently, some requests may already be in flight when the tally locks.
 
-For **self-consistency sampling** on one prompt, `CiteStopper` also offers a statistical stopping rule. With independent draws from a fixed answer distribution with a unique most probable label, `delta` bounds the probability of ever certifying a wrong mode through that rule. The returned `scope` identifies the kind of decision. For **LLM-as-a-judge panels**, use `audit_panel` on labeled examples to measure agreement in judges’ errors and evaluate which judges to keep.
+This example uses the first-pass verdicts for pair `2d989dfb-7cf0-549e-945c-3dd060d1fad5`, replayed in the seven-model order used by Cloture’s evaluation. Each judge contributes one unweighted vote. [Recorded verdicts](https://github.com/ScalerLab/JudgeBench/tree/e2c52c284e735e139b3daa61c206ee208f36c461/outputs) · [Panel order and vote encoding](benchmarks/real_world_judgebench.py)
+
+For **self-consistency sampling** on one prompt, `CiteStopper` also offers a statistical stopping rule. With independent draws from a fixed answer distribution that has a unique most probable label, `delta` bounds the probability of ever certifying a wrong mode through that rule. The returned `scope` identifies the kind of decision. For **LLM-as-a-judge panels**, use `audit_panel` on labeled examples to measure how often judges share errors and evaluate which judges to keep.
 
 [Async model-call integration](docs/integrations.md) · [Stopping assumptions](docs/ARCHITECTURE.md) · [Judge-panel evaluation](docs/REAL_WORLD_EVAL.md)
 
@@ -40,11 +44,11 @@ Evaluated directly on official public verdicts from [`allenai/reward-bench-resul
 
 - **AllenAI RewardBench (`2,985` items, `23` strata, `11` models):**
   - 7 generative frontier LLMs (`GPT-4o ×2`, `GPT-4o-mini`, `Gemini-1.5-Flash`, `Llama-3.1-405B/70B`, `Gemma-2-27B`) deliver only **`2.21` effective votes** (`95% CI [2.11, 2.31]`, within-family $\bar{\phi} = 0.504$ vs. cross-family $0.317$, `p = 0.00050`, audited in `67.2 ms`).
-  - Pruning `11 → 3` raises accuracy **`+3.85 pp` (`92.03% → 95.88%`)** — **`+3.65 pp` strictly out-of-sample (5-fold CV)**, beating the best single model (`94.97%`) — at **`-72.7%` lower API cost**.
+  - Pruning `11 → 3` raises accuracy **`+3.85 pp` (`92.03% → 95.88%`)** — **`+3.65 pp` strictly out-of-sample (5-fold CV)**, beating the best single model (`94.97%`) — with **72.7% fewer judges per item**.
   - Paired `AgentRace` certifies `GPT-4o` on **`50 / 50` (`100%`)** runs saving **`80.4%` of evals**; `Active-PPI++` holds **`100%` anytime coverage** (`10.46×` var reduction, removing `-12.41 pp` bias).
 - **ScalerLab JudgeBench (`350` objective MMLU-Pro/LiveBench/LiveCodeBench items, `13` models across 5 labs):**
   - Even picking the **Top-7 models from 5 different labs** (`o1-preview`, `o1-mini`, `GPT-4o`, `Claude-3.5-Sonnet`, `Gemini-1.5-Pro`, `Llama-3.1-405B`, `Skywork-RM-Gemma-27B`) collapses to **`n_eff = 2.49 / 7`** (`+11.29 pp` Condorcet gap); single-pass 11 generative LLMs show a **`+15.36 pp`** Condorcet collapse (`86.36%` predicted vs. `71.00%` actual).
-  - Pruning `13 → 3` (`o1-preview + Claude-3.5-Sonnet + Skywork-RM-Gemma-27B`) raises accuracy **`+19.29 pp` (`52.14% → 71.43%`, beating `o1-preview` `70.86%`)** — verified **`+18.33 pp` strictly out-of-sample (5-fold CV)** (Pass-0: **`+7.14 pp` OOS CV**) — at **`-76.9%` lower API cost**!
+  - Pruning `13 → 3` (`o1-preview + Claude-3.5-Sonnet + Skywork-RM-Gemma-27B`) raises accuracy **`+19.29 pp` (`52.14% → 71.43%`, beating `o1-preview` `70.86%`)** — verified **`+18.33 pp` strictly out-of-sample (5-fold CV)** (Pass-0: **`+7.14 pp` OOS CV**) — with **76.9% fewer judges per item**.
   - Real `Active-PPI++` (`GPT-4o` proxy → `o1-preview`, 20% audit): **`100%` anytime coverage across all `350` steps** (`2.90×` var reduction, removing `-20.57 pp` proxy bias).
 
 ---
@@ -67,7 +71,7 @@ brew install pgg898200-ship-it/cloture/cloture
 cargo build --release --workspace && ./target/release/cloture bench
 ```
 
-### 1. Stop parallel async LLM/agent rollouts the millisecond consensus is certified
+### 1. Stop sampling when Cloture certifies a winner
 
 ```python
 import asyncio
@@ -111,7 +115,7 @@ print(f"Condorcet gap: {report.condorcet_gap*100:.1f} pp | permutation p={report
 # Audit any CSV export straight from the static binary (<26 ms for 9 x 1,000!)
 cloture audit --csv judges.csv --gold-col gold --strata-col domain --perms 2000
 
-# Halt an open-ended vote stream the millisecond CITE certifies a winner
+# Stop reading an open-ended vote stream when CITE certifies a winner
 printf '42\n42\n42\n42\n42\n42\n42\n42\n42\n42\n' | cloture stop --mode cite --delta 0.05
 
 # Grey-box ASC-D stopping on streamed probability vectors
@@ -153,7 +157,7 @@ All numbers below were measured live on `Intel Xeon @ 2.30 GHz (2 vCPU)`, Python
 | **Median Wall-Clock** | **`26.0 ms`** (`14.7 ms` binary exact DP) | `1,446.7 ms` | **`55.7×` faster** (`max_det_diff = 2.66e-15`) |
 | **Effective Votes (`n_eff`)** | `2.21` Kish (`95% CI [2.10, 2.34]`) / `2.13` Eigen | Identical (`1.3e-15` diff) | 9 judges behave like **2.2 independent votes** |
 | **Condorcet Gap & Omnibus `p`** | **`+20.43 pp`** (`94.91%` null vs `74.48%` actual), `p = 0.0005` | `p = 0.0005` | Correlated errors destroy majority lift |
-| **LOO Redundant-Judge Pruning** | Drop 1 judge (`#6`): **`+1.52 pp` acc**, `-11.1%` cost; Drop 2 (`#6,#8`): **`+2.72 pp` acc** (`74.5% -> 77.2%`), **`-22.2%` cost** | Identical | Fewer, less-correlated judges win |
+| **LOO Redundant-Judge Pruning** | Drop 1 judge (`#6`): **`+1.52 pp` acc**, 11.1% fewer judges per item; Drop 2 (`#6,#8`): **`+2.72 pp` acc** (`74.5% -> 77.2%`), **22.2% fewer judges per item** | Identical | Fewer, less-correlated judges win |
 
 ### 3. Realized vs. Population Correlated Rollouts (`rho = 0.60`, `30 prompts x 16 rollouts`, `delta = 0.05`)
 
