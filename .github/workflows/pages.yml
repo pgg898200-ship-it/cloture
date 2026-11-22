@@ -1,4 +1,4 @@
-name: Deploy Docs & Agent Markdown Site
+name: Deploy Docs & Interactive WASM Playground
 
 on:
   push:
@@ -15,10 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +35,7 @@ jobs:
           rm -rf _site && mkdir -p _site/docs/assets _site/benchmarks _site/wasm _site/js
           cp site/index.html site/playground.html _site/
           cp target/wasm32-unknown-unknown/release/cloture_core.wasm _site/wasm/cloture_core.wasm
+          chmod 644 _site/wasm/cloture_core.wasm
           cp js/cloture.mjs js/cloture.d.ts _site/js/
           cp README.md llms.txt llms-full.txt SKILL.md NOTICE LICENSE CHANGELOG.md server.json _site/
           cp docs/ARCHITECTURE.md docs/benchmarks.md docs/comparisons.md docs/integrations.md _site/docs/
@@ -54,6 +52,13 @@ jobs:
         with:
           path: _site
 
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
