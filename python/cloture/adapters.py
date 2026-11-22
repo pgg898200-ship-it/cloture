@@ -30,6 +30,9 @@ class NamedPanelAudit:
         out.sort(key=lambda t: t[1], reverse=True)
         return out
 
+    def __getattr__(self, name: str):
+        return getattr(self.report, name)
+
 
 def _encode_labels(
     raw_votes: Sequence[Sequence[str]],

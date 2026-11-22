@@ -40,7 +40,7 @@ jobs:
           cp README.md llms.txt llms-full.txt SKILL.md NOTICE LICENSE CHANGELOG.md server.json _site/
           cp docs/ARCHITECTURE.md docs/benchmarks.md docs/comparisons.md docs/integrations.md docs/REAL_WORLD_EVAL.md _site/docs/
           cp docs/assets/*.svg _site/docs/assets/
-          cp benchmarks/results.json benchmarks/rewardbench_receipts.json _site/benchmarks/
+          cp benchmarks/results.json benchmarks/rewardbench_receipts.json benchmarks/judgebench_receipts.json _site/benchmarks/
           cp include/cloture.h _site/cloture.h
           touch _site/.nojekyll
 

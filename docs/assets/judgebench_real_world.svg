@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" width="980" height="420" role="img" aria-label="Real-world ScalerLab JudgeBench 13-model cross-family pruning and error correlation heatmap">
+<defs>
+  <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#0d1117"/>
+    <stop offset="100%" stop-color="#111827"/>
+  </linearGradient>
+</defs>
+<rect width="980" height="420" rx="14" fill="url(#bg4)" stroke="#263147" stroke-width="1.5"/>
+<text x="28" y="34" fill="#e6edf7" font-family="ui-sans-serif,system-ui,-apple-system,sans-serif" font-size="16" font-weight="700">Real-World Cross-Family Audit: ScalerLab JudgeBench (350 Objective Items, 13 Frontier Models)</text>
+<text x="952" y="34" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">OpenAI o1/4o · Claude-3.5 · Gemini-1.5 · Llama-3.1 · Skywork</text>
+<line x1="28" y1="48" x2="952" y2="48" stroke="#223047" stroke-width="1"/>
+<rect x="28" y="64" width="470" height="332" rx="10" fill="#131a26" stroke="#25324a" stroke-width="1"/>
+<text x="46" y="88" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="700">LOO Pruning 13 → 3 Judges (5-Fold Out-of-Sample Verified)</text>
+<text x="46" y="106" fill="#93a3bd" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11">Swap-consistent OOS: +18.3 pp (52.1%→70.5%) · Pass-0 OOS: +7.1 pp at -76.9% cost</text>
+<line x1="76" y1="281.9" x2="474" y2="281.9" stroke="#1f2c40" stroke-width="1"/>
+<text x="68" y="285.9" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10">50%</text>
+<line x1="76" y1="237.8" x2="474" y2="237.8" stroke="#1f2c40" stroke-width="1"/>
+<text x="68" y="241.8" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10">60%</text>
+<line x1="76" y1="193.7" x2="474" y2="193.7" stroke="#1f2c40" stroke-width="1"/>
+<text x="68" y="197.7" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10">70%</text>
+<line x1="76" y1="149.6" x2="474" y2="149.6" stroke="#1f2c40" stroke-width="1"/>
+<text x="68" y="153.6" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10">80%</text>
+<line x1="76" y1="190.0" x2="474" y2="190.0" stroke="#f7b267" stroke-width="1.1" stroke-dasharray="4,3"/>
+<text x="80" y="186.0" fill="#f7b267" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">Single o1-preview swap (70.9%)</text>
+<polyline points="76.0,187.4 115.8,181.8 155.6,176.1 195.4,174.8 235.2,171.1 275.0,166.0 314.8,161.6 354.6,158.7 394.4,154.1 434.2,154.1 474.0,152.6" fill="none" stroke="#7aa2f7" stroke-width="2.2"/>
+<polyline points="76.0,272.5 115.8,257.6 155.6,246.0 195.4,233.4 235.2,222.7 275.0,213.9 314.8,202.6 354.6,195.8 394.4,193.1 434.2,192.5 474.0,187.4" fill="none" stroke="#38d9c0" stroke-width="2.6"/>
+<circle cx="76.0" cy="187.4" r="4.8" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="115.8" cy="181.8" r="3.0" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="155.6" cy="176.1" r="3.0" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="195.4" cy="174.8" r="3.0" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="235.2" cy="171.1" r="3.0" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="275.0" cy="166.0" r="3.0" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="314.8" cy="161.6" r="3.0" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="354.6" cy="158.7" r="3.0" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="394.4" cy="154.1" r="3.0" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="434.2" cy="154.1" r="3.0" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="474.0" cy="152.6" r="4.8" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="76.0" cy="272.5" r="5.2" fill="#f87171" stroke="#0d1117" stroke-width="1.1"/>
+<text x="76.0" y="321" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">K=13</text>
+<circle cx="115.8" cy="257.6" r="3.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="155.6" cy="246.0" r="3.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<text x="155.6" y="321" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">K=11</text>
+<circle cx="195.4" cy="233.4" r="3.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="235.2" cy="222.7" r="3.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<text x="235.2" y="321" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">K=9</text>
+<circle cx="275.0" cy="213.9" r="3.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="314.8" cy="202.6" r="3.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<text x="314.8" y="321" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">K=7</text>
+<circle cx="354.6" cy="195.8" r="3.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="394.4" cy="193.1" r="3.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<text x="394.4" y="321" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">K=5</text>
+<circle cx="434.2" cy="192.5" r="3.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<circle cx="474.0" cy="187.4" r="5.2" fill="#38d9c0" stroke="#0d1117" stroke-width="1.1"/>
+<text x="474.0" y="321" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">K=3</text>
+<text x="82.0" y="286.5" fill="#f87171" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" font-weight="700">52.1% (Swap)</text>
+<text x="470.0" y="202.4" text-anchor="end" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2" font-weight="700">71.4% (+19.3 pp)</text>
+<text x="82.0" y="181.4" fill="#7aa2f7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" font-weight="700">71.4% (Pass-0)</text>
+<text x="470.0" y="144.6" text-anchor="end" fill="#7aa2f7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2" font-weight="700">79.3% (+7.9 pp)</text>
+<rect x="46" y="336" width="434" height="46" rx="7" fill="#152626" stroke="#255450" stroke-width="1"/>
+<text x="58" y="354" fill="#38d9c0" font-family="ui-sans-serif,system-ui,sans-serif" font-size="10.5" font-weight="700">OPTIMAL CROSS-FAMILY TRIAD (BEATS o1-preview AT -76.9% CALLS):</text>
+<text x="58" y="371" fill="#e2e8f0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">o1-preview (OpenAI) + Claude-3.5-Sonnet (Anthropic) + Skywork-RM-27B (Gemma)</text>
+<rect x="514" y="64" width="438" height="332" rx="10" fill="#131a26" stroke="#25324a" stroke-width="1"/>
+<text x="532" y="88" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="700">Top-7 Frontier Cross-Family Error Correlation (φ)</text>
+<text x="532" y="106" fill="#93a3bd" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11">Even 7 top models from 5 labs → n_eff = 2.49/7 (+11.3 pp Condorcet gap)</text>
+<text x="602" y="147" text-anchor="end" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">o1-prev</text>
+<text x="624.5" y="122" text-anchor="middle" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="8.2">o1-pre</text>
+<rect x="610" y="128" width="27" height="27" rx="4" fill="#24344d"/>
+<text x="623.5" y="145.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">1.0</text>
+<rect x="639" y="128" width="27" height="27" rx="4" fill="#991b1b"/>
+<text x="652.5" y="145.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.38</text>
+<rect x="668" y="128" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="681.5" y="145.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.33</text>
+<rect x="697" y="128" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="710.5" y="145.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.27</text>
+<rect x="726" y="128" width="27" height="27" rx="4" fill="#115e59"/>
+<text x="739.5" y="145.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.18</text>
+<rect x="755" y="128" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="768.5" y="145.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.27</text>
+<rect x="784" y="128" width="27" height="27" rx="4" fill="#115e59"/>
+<text x="797.5" y="145.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.20</text>
+<text x="602" y="176" text-anchor="end" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">o1-mini</text>
+<text x="653.5" y="122" text-anchor="middle" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="8.2">o1-min</text>
+<rect x="610" y="157" width="27" height="27" rx="4" fill="#991b1b"/>
+<text x="623.5" y="174.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.38</text>
+<rect x="639" y="157" width="27" height="27" rx="4" fill="#24344d"/>
+<text x="652.5" y="174.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">1.0</text>
+<rect x="668" y="157" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="681.5" y="174.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.32</text>
+<rect x="697" y="157" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="710.5" y="174.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.32</text>
+<rect x="726" y="157" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="739.5" y="174.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.24</text>
+<rect x="755" y="157" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="768.5" y="174.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.30</text>
+<rect x="784" y="157" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="797.5" y="174.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.27</text>
+<text x="602" y="205" text-anchor="end" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">GPT-4o</text>
+<text x="682.5" y="122" text-anchor="middle" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="8.2">GPT-4o</text>
+<rect x="610" y="186" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="623.5" y="203.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.33</text>
+<rect x="639" y="186" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="652.5" y="203.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.32</text>
+<rect x="668" y="186" width="27" height="27" rx="4" fill="#24344d"/>
+<text x="681.5" y="203.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">1.0</text>
+<rect x="697" y="186" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="710.5" y="203.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.31</text>
+<rect x="726" y="186" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="739.5" y="203.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.30</text>
+<rect x="755" y="186" width="27" height="27" rx="4" fill="#991b1b"/>
+<text x="768.5" y="203.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.40</text>
+<rect x="784" y="186" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="797.5" y="203.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.34</text>
+<text x="602" y="234" text-anchor="end" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">Claude3.5</text>
+<text x="711.5" y="122" text-anchor="middle" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="8.2">Claude</text>
+<rect x="610" y="215" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="623.5" y="232.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.27</text>
+<rect x="639" y="215" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="652.5" y="232.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.32</text>
+<rect x="668" y="215" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="681.5" y="232.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.31</text>
+<rect x="697" y="215" width="27" height="27" rx="4" fill="#24344d"/>
+<text x="710.5" y="232.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">1.0</text>
+<rect x="726" y="215" width="27" height="27" rx="4" fill="#115e59"/>
+<text x="739.5" y="232.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.19</text>
+<rect x="755" y="215" width="27" height="27" rx="4" fill="#991b1b"/>
+<text x="768.5" y="232.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.40</text>
+<rect x="784" y="215" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="797.5" y="232.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.28</text>
+<text x="602" y="263" text-anchor="end" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">Gem-Pro</text>
+<text x="740.5" y="122" text-anchor="middle" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="8.2">Gem-Pr</text>
+<rect x="610" y="244" width="27" height="27" rx="4" fill="#115e59"/>
+<text x="623.5" y="261.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.18</text>
+<rect x="639" y="244" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="652.5" y="261.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.24</text>
+<rect x="668" y="244" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="681.5" y="261.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.30</text>
+<rect x="697" y="244" width="27" height="27" rx="4" fill="#115e59"/>
+<text x="710.5" y="261.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.19</text>
+<rect x="726" y="244" width="27" height="27" rx="4" fill="#24344d"/>
+<text x="739.5" y="261.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">1.0</text>
+<rect x="755" y="244" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="768.5" y="261.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.30</text>
+<rect x="784" y="244" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="797.5" y="261.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.31</text>
+<text x="602" y="292" text-anchor="end" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">Llama405</text>
+<text x="769.5" y="122" text-anchor="middle" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="8.2">Llama4</text>
+<rect x="610" y="273" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="623.5" y="290.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.27</text>
+<rect x="639" y="273" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="652.5" y="290.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.30</text>
+<rect x="668" y="273" width="27" height="27" rx="4" fill="#991b1b"/>
+<text x="681.5" y="290.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.40</text>
+<rect x="697" y="273" width="27" height="27" rx="4" fill="#991b1b"/>
+<text x="710.5" y="290.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.40</text>
+<rect x="726" y="273" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="739.5" y="290.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.30</text>
+<rect x="755" y="273" width="27" height="27" rx="4" fill="#24344d"/>
+<text x="768.5" y="290.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">1.0</text>
+<rect x="784" y="273" width="27" height="27" rx="4" fill="#991b1b"/>
+<text x="797.5" y="290.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.39</text>
+<text x="602" y="321" text-anchor="end" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">Skywork</text>
+<text x="798.5" y="122" text-anchor="middle" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="8.2">Skywor</text>
+<rect x="610" y="302" width="27" height="27" rx="4" fill="#115e59"/>
+<text x="623.5" y="319.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.20</text>
+<rect x="639" y="302" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="652.5" y="319.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.27</text>
+<rect x="668" y="302" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="681.5" y="319.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.34</text>
+<rect x="697" y="302" width="27" height="27" rx="4" fill="#1d4ed8"/>
+<text x="710.5" y="319.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.28</text>
+<rect x="726" y="302" width="27" height="27" rx="4" fill="#b45309"/>
+<text x="739.5" y="319.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.31</text>
+<rect x="755" y="302" width="27" height="27" rx="4" fill="#991b1b"/>
+<text x="768.5" y="319.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">.39</text>
+<rect x="784" y="302" width="27" height="27" rx="4" fill="#24344d"/>
+<text x="797.5" y="319.5" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">1.0</text>
+<rect x="532" y="336" width="196" height="46" rx="7" fill="#172133" stroke="#2b3d59" stroke-width="1"/>
+<text x="544" y="354" fill="#f87171" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" font-weight="700">+15.4 pp Condorcet Gap</text>
+<text x="544" y="371" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">11 LLMs Pass-0: 86.4% pred vs 71.0%</text>
+<rect x="738" y="336" width="196" height="46" rx="7" fill="#172133" stroke="#2b3d59" stroke-width="1"/>
+<text x="750" y="354" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" font-weight="700">100% Active-PPI++ Cov</text>
+<text x="750" y="371" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">4o→o1 (2.9× var red, -20.6pp fix)</text>
+</svg>

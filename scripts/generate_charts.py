@@ -348,21 +348,151 @@ def build_rewardbench_svg(rb: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def build_judgebench_svg(jb: dict) -> str:
+    swap_traj = [s for s in jb["frontier_13_pruning_swap"] if s["k"] >= 3]
+    p0_traj = [s for s in jb["frontier_13_pruning_pass0"] if s["k"] >= 3]
+    cv_swap = jb["cv5_out_of_sample_swap"]
+    cv_p0 = jb["cv5_out_of_sample_pass0"]
+    top7 = jb["top7_cross_family_swap"]
+    gen11_p0 = jb["generative_11_pass0"]
+    ppi = jb["active_ppi_gpt4o_to_o1_preview"]
+
+    W, H = 980, 420
+    lines = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="Real-world ScalerLab JudgeBench 13-model cross-family pruning and error correlation heatmap">',
+        "<defs>",
+        '  <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1">',
+        '    <stop offset="0%" stop-color="#0d1117"/>',
+        '    <stop offset="100%" stop-color="#111827"/>',
+        "  </linearGradient>",
+        "</defs>",
+        f'<rect width="{W}" height="{H}" rx="14" fill="url(#bg4)" stroke="#263147" stroke-width="1.5"/>',
+        '<text x="28" y="34" fill="#e6edf7" font-family="ui-sans-serif,system-ui,-apple-system,sans-serif" font-size="16" font-weight="700">Real-World Cross-Family Audit: ScalerLab JudgeBench (350 Objective Items, 13 Frontier Models)</text>',
+        '<text x="952" y="34" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">OpenAI o1/4o · Claude-3.5 · Gemini-1.5 · Llama-3.1 · Skywork</text>',
+        '<line x1="28" y1="48" x2="952" y2="48" stroke="#223047" stroke-width="1"/>',
+        # Left panel: 13 -> 3 pruning trajectory (both Swap-Consistent and Pass-0) + 5-fold OOS CV
+        '<rect x="28" y="64" width="470" height="332" rx="10" fill="#131a26" stroke="#25324a" stroke-width="1"/>',
+        '<text x="46" y="88" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="700">LOO Pruning 13 → 3 Judges (5-Fold Out-of-Sample Verified)</text>',
+        f'<text x="46" y="106" fill="#93a3bd" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11">Swap-consistent OOS: +{cv_swap["out_of_sample_gain_pp"]:.1f} pp ({cv_swap["mean_full_test_accuracy"]*100:.1f}%→{cv_swap["mean_pruned_test_accuracy"]*100:.1f}%) · Pass-0 OOS: +{cv_p0["out_of_sample_gain_pp"]:.1f} pp at -76.9% cost</text>',
+    ]
+
+    px0, px1 = 76, 474
+    py0, py1 = 132, 304
+    min_acc, max_acc = 45.0, 84.0
+
+    def map_x(idx: int, n_pts: int) -> float:
+        return px0 + (idx / max(1, n_pts - 1)) * (px1 - px0)
+
+    def map_y(acc_pct: float) -> float:
+        return py1 - ((acc_pct - min_acc) / (max_acc - min_acc)) * (py1 - py0)
+
+    for pct in (50, 60, 70, 80):
+        gy = map_y(float(pct))
+        lines.append(f'<line x1="{px0}" y1="{gy:.1f}" x2="{px1}" y2="{gy:.1f}" stroke="#1f2c40" stroke-width="1"/>')
+        lines.append(f'<text x="{px0-8}" y="{gy+4:.1f}" text-anchor="end" fill="#8b9ab5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10">{pct}%</text>')
+
+    # o1-preview single model reference (swap-consistent 70.86%)
+    o1_y = map_y(70.86)
+    lines.append(f'<line x1="{px0}" y1="{o1_y:.1f}" x2="{px1}" y2="{o1_y:.1f}" stroke="#f7b267" stroke-width="1.1" stroke-dasharray="4,3"/>')
+    lines.append(f'<text x="{px0+4}" y="{o1_y-4:.1f}" fill="#f7b267" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">Single o1-preview swap (70.9%)</text>')
+
+    # Plot Pass-0 trajectory (blue) and Swap-Consistent trajectory (teal)
+    pts_p0 = [(map_x(i, len(p0_traj)), map_y(s["panel_accuracy"] * 100.0), s["k"], s["panel_accuracy"] * 100.0) for i, s in enumerate(p0_traj)]
+    pts_sw = [(map_x(i, len(swap_traj)), map_y(s["panel_accuracy"] * 100.0), s["k"], s["panel_accuracy"] * 100.0) for i, s in enumerate(swap_traj)]
+
+    lines.append(f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y, _, _ in pts_p0)}" fill="none" stroke="#7aa2f7" stroke-width="2.2"/>')
+    lines.append(f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y, _, _ in pts_sw)}" fill="none" stroke="#38d9c0" stroke-width="2.6"/>')
+
+    for x, y, k_val, _ in pts_p0:
+        r = 4.8 if k_val in (13, 3) else 3.0
+        lines.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r}" fill="#7aa2f7" stroke="#0d1117" stroke-width="1.1"/>')
+    for x, y, k_val, _ in pts_sw:
+        r = 5.2 if k_val in (13, 3) else 3.2
+        fill = "#38d9c0" if k_val == 3 else ("#f87171" if k_val == 13 else "#38d9c0")
+        lines.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r}" fill="{fill}" stroke="#0d1117" stroke-width="1.1"/>')
+        if k_val in (13, 11, 9, 7, 5, 3):
+            lines.append(f'<text x="{x:.1f}" y="{py1+17}" text-anchor="middle" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.8">K={k_val}</text>')
+
+    lines += [
+        f'<text x="{pts_sw[0][0]+6:.1f}" y="{pts_sw[0][1]+14:.1f}" fill="#f87171" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" font-weight="700">52.1% (Swap)</text>',
+        f'<text x="{pts_sw[-1][0]-4:.1f}" y="{pts_sw[-1][1]+15:.1f}" text-anchor="end" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2" font-weight="700">71.4% (+19.3 pp)</text>',
+        f'<text x="{pts_p0[0][0]+6:.1f}" y="{pts_p0[0][1]-6:.1f}" fill="#7aa2f7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" font-weight="700">71.4% (Pass-0)</text>',
+        f'<text x="{pts_p0[-1][0]-4:.1f}" y="{pts_p0[-1][1]-8:.1f}" text-anchor="end" fill="#7aa2f7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2" font-weight="700">79.3% (+7.9 pp)</text>',
+        '<rect x="46" y="336" width="434" height="46" rx="7" fill="#152626" stroke="#255450" stroke-width="1"/>',
+        '<text x="58" y="354" fill="#38d9c0" font-family="ui-sans-serif,system-ui,sans-serif" font-size="10.5" font-weight="700">OPTIMAL CROSS-FAMILY TRIAD (BEATS o1-preview AT -76.9% CALLS):</text>',
+        '<text x="58" y="371" fill="#e2e8f0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10.2">o1-preview (OpenAI) + Claude-3.5-Sonnet (Anthropic) + Skywork-RM-27B (Gemma)</text>',
+    ]
+
+    # Right panel: Top-7 Cross-Family Error Correlation Heatmap (7x7) + Condorcet Collapse KPI
+    lines += [
+        '<rect x="514" y="64" width="438" height="332" rx="10" fill="#131a26" stroke="#25324a" stroke-width="1"/>',
+        '<text x="532" y="88" fill="#e6edf7" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13.5" font-weight="700">Top-7 Frontier Cross-Family Error Correlation (φ)</text>',
+        f'<text x="532" y="106" fill="#93a3bd" font-family="ui-sans-serif,system-ui,sans-serif" font-size="11">Even 7 top models from 5 labs → n_eff = {top7["n_eff_kish"]:.2f}/7 (+{top7["condorcet_gap_pp"]:.1f} pp Condorcet gap)</text>',
+    ]
+
+    short_labels = ["o1-prev", "o1-mini", "GPT-4o", "Claude3.5", "Gem-Pro", "Llama405", "Skywork"]
+    phi_mat = top7["phi_matrix"]
+    gx0, gy0 = 610, 128
+    cell = 29
+
+    def phi_color(v: float, diag: bool) -> str:
+        if diag:
+            return "#24344d"
+        if v >= 0.36:
+            return "#991b1b"
+        if v >= 0.30:
+            return "#b45309"
+        if v >= 0.24:
+            return "#1d4ed8"
+        return "#115e59"
+
+    for i, lbl in enumerate(short_labels):
+        lines.append(f'<text x="{gx0-8}" y="{gy0 + i*cell + 19}" text-anchor="end" fill="#cbd5e1" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">{lbl}</text>')
+        lines.append(f'<text x="{gx0 + i*cell + cell/2:.1f}" y="{gy0-6}" text-anchor="middle" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="8.2">{lbl[:6]}</text>')
+        for j in range(len(short_labels)):
+            v = phi_mat[i][j]
+            bg = phi_color(v, i == j)
+            x = gx0 + j * cell
+            y = gy0 + i * cell
+            lines.append(f'<rect x="{x}" y="{y}" width="{cell-2}" height="{cell-2}" rx="4" fill="{bg}"/>')
+            txt = "1.0" if i == j else f".{int(round(v*100)):02d}"
+            lines.append(f'<text x="{x + (cell-2)/2:.1f}" y="{y + 17.5:.1f}" text-anchor="middle" fill="#f8fafc" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9">{txt}</text>')
+
+    # Bottom right 2 compact KPI boxes
+    lines += [
+        '<rect x="532" y="336" width="196" height="46" rx="7" fill="#172133" stroke="#2b3d59" stroke-width="1"/>',
+        f'<text x="544" y="354" fill="#f87171" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" font-weight="700">+{gen11_p0["condorcet_gap_pp"]:.1f} pp Condorcet Gap</text>',
+        f'<text x="544" y="371" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">11 LLMs Pass-0: 86.4% pred vs 71.0%</text>',
+        '<rect x="738" y="336" width="196" height="46" rx="7" fill="#172133" stroke="#2b3d59" stroke-width="1"/>',
+        f'<text x="750" y="354" fill="#38d9c0" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11.5" font-weight="700">100% Active-PPI++ Cov</text>',
+        f'<text x="750" y="371" fill="#93a3bd" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5">4o→o1 ({ppi["mean_variance_reduction"]:.1f}× var red, {ppi["naive_proxy_bias_pp"]:+.1f}pp fix)</text>',
+        "</svg>",
+    ]
+    return "\n".join(lines) + "\n"
+
+
 def main() -> int:
     data = json.loads(RESULTS_PATH.read_text(encoding="utf-8"))
     ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+    generated = []
     p1 = ASSETS_DIR / "consensus_and_panel.svg"
     p2 = ASSETS_DIR / "speed_and_validity.svg"
     p1.write_text(build_consensus_and_panel_svg(data), encoding="utf-8")
     p2.write_text(build_speed_and_validity_svg(data), encoding="utf-8")
+    generated.extend([str(p1), str(p2)])
     rb_path = ROOT / "benchmarks" / "rewardbench_receipts.json"
     if rb_path.exists():
         rb = json.loads(rb_path.read_text(encoding="utf-8"))
         p3 = ASSETS_DIR / "rewardbench_real_world.svg"
         p3.write_text(build_rewardbench_svg(rb), encoding="utf-8")
-        print(f"Generated {p1}, {p2}, and {p3}")
-    else:
-        print(f"Generated {p1} and {p2}")
+        generated.append(str(p3))
+    jb_path = ROOT / "benchmarks" / "judgebench_receipts.json"
+    if jb_path.exists():
+        jb = json.loads(jb_path.read_text(encoding="utf-8"))
+        p4 = ASSETS_DIR / "judgebench_real_world.svg"
+        p4.write_text(build_judgebench_svg(jb), encoding="utf-8")
+        generated.append(str(p4))
+    print("Generated:", ", ".join(generated))
     return 0
 
 

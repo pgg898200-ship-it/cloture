@@ -221,10 +221,11 @@
       <h1>End the multi-agent debate the millisecond the math proves who won.</h1>
       <p class="lead">
         And catch when your LLM-as-a-judge panel is <strong>2.2 correlated votes wearing 9 trench coats</strong>.
-        Audited on <strong>2,985 real AllenAI RewardBench items</strong>: pruning 11 frontier judges to 3 raised accuracy <strong>+3.85 pp (92.0% &rarr; 95.9%)</strong> while cutting API cost <strong>72.7%</strong>.
+        Audited across <strong>AllenAI RewardBench (2,985 items)</strong> and <strong>ScalerLab JudgeBench (350 objective items, 5 frontier labs)</strong>: pruning redundant judges lifts out-of-sample accuracy <strong>+3.65 pp to +18.33 pp</strong> while cutting API cost <strong>72.7%&ndash;76.9%</strong>.
       </p>
-      <p style="margin:0 0 1.5rem;">
+      <p style="margin:0 0 1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
         <a href="playground.html" style="display:inline-block;background:var(--accent);color:#061312;font-family:var(--mono);font-weight:700;font-size:0.9rem;padding:0.65rem 1.15rem;border-radius:8px;text-decoration:none;">Launch Live Browser Playground (243 KB Rust WASM) &rarr;</a>
+        <a href="https://colab.research.google.com/github/pgg898200-ship-it/cloture/blob/main/examples/cloture_frontier_eval_colab.ipynb" style="display:inline-block;background:var(--surface-2);color:var(--text);border:1px solid var(--border);font-family:var(--mono);font-weight:600;font-size:0.9rem;padding:0.65rem 1.15rem;border-radius:8px;text-decoration:none;">Open 15-Second Colab Notebook &rarr;</a>
       </p>
 
       <div class="install-box">
@@ -241,6 +242,7 @@
       </div>
 
       <img src="docs/assets/rewardbench_real_world.svg" alt="Real-world AllenAI RewardBench 2985-item frontier judge pruning and correlation collapse chart" style="width:100%;height:auto;border-radius:12px;margin:0.5rem 0 1.25rem;" />
+      <img src="docs/assets/judgebench_real_world.svg" alt="Real-world ScalerLab JudgeBench 13-model cross-family pruning and error correlation heatmap" style="width:100%;height:auto;border-radius:12px;margin:0 0 1.25rem;" />
       <img src="docs/assets/consensus_and_panel.svg" alt="cloture consensus stopping and correlated judge-panel audit benchmark chart" style="width:100%;height:auto;border-radius:12px;margin:0 0 1.25rem;" />
       <img src="docs/assets/speed_and_validity.svg" alt="cloture speedup vs PyPI packages and anytime-valid Type-I error control chart" style="width:100%;height:auto;border-radius:12px;margin:0 0 1.5rem;" />
 
@@ -253,7 +255,7 @@
         <div class="card">
           <div class="metric">55.7&times;</div>
           <div class="card-title">Correlated Panel Audit</div>
-          <div class="card-sub">9&times;1,000 audit in <code>26.0 ms</code> vs. NumPy/SciPy <code>1.45 s</code>; RewardBench 11&rarr;3 pruning lifts accuracy <strong>+3.85 pp</strong> at -72.7% cost.</div>
+          <div class="card-sub">9&times;1,000 audit in <code>26.0 ms</code> vs. NumPy/SciPy <code>1.45 s</code>; OOS CV pruning lifts accuracy <strong>+3.7 to +18.3 pp</strong> at -73% to -77% cost.</div>
         </div>
         <div class="card">
           <div class="metric">415&times;</div>
@@ -280,8 +282,9 @@ result = await cloture.consensus(
 )
 
 # Audit any CSV or Promptfoo eval export directly (or run: cloture audit --csv judges.csv)
-report = cloture.audit_csv("judges.csv", gold_col="gold", strata_col="subset")
-print(f"{report.k_judges} judges -&gt; {report.n_eff_kish:.2f} effective votes (Condorcet gap {report.condorcet_gap*100:.1f} pp)")</pre>
+audit = cloture.audit_csv("judges.csv", gold_col="gold", strata_col="subset")
+r = audit.report
+print(f"{r.k_judges} judges -&gt; {r.n_eff_kish:.2f} effective votes (Condorcet gap {r.condorcet_gap*100:.1f} pp)")</pre>
 
     <h2>Verified Head-to-Head Summary (<code>v0.2.0</code>)</h2>
     <table>
@@ -303,9 +306,15 @@ print(f"{report.k_judges} judges -&gt; {report.n_eff_kish:.2f} effective votes (
         </tr>
         <tr>
           <td>Real AllenAI RewardBench (<code>2,985</code> items, 11 LLMs)</td>
-          <td><code>11 &rarr; 3</code> judges: <strong>95.88%</strong> acc, <code>67.2 ms</code></td>
+          <td><code>11 &rarr; 3</code> judges: <strong>95.88%</strong> (<code>+3.65 pp</code> OOS CV)</td>
           <td>Full 11-model panel (<code>92.03%</code>) / Best single RM (<code>94.97%</code>)</td>
           <td><strong>+3.85 pp</strong> higher acc at <strong>-72.7%</strong> API cost</td>
+        </tr>
+        <tr>
+          <td>Real ScalerLab JudgeBench (<code>350</code> items, 13 LLMs, 5 labs)</td>
+          <td><code>13 &rarr; 3</code> triad: <strong>71.43%</strong> (<code>+18.33 pp</code> OOS CV)</td>
+          <td>Full 13-model panel (<code>52.14%</code>) / Single <code>o1-preview</code> (<code>70.86%</code>)</td>
+          <td><strong>+19.29 pp</strong> higher acc at <strong>-76.9%</strong> API cost</td>
         </tr>
         <tr>
           <td>Correlated Rollouts (<code>&rho;=0.60</code>, <code>30&times;16</code>)</td>
@@ -320,8 +329,8 @@ print(f"{report.k_judges} judges -&gt; {report.n_eff_kish:.2f} effective votes (
           <td><strong>415&times;</strong> / <strong>25.7&times;</strong> vs. <code>confseq</code>; <strong>1.10&times;</strong> batch &amp; <strong>297&times;</strong> stream vs. <code>expectation</code></td>
         </tr>
         <tr>
-          <td>Active-PPI++ (<code>N=4000</code> &amp; Real RewardBench)</td>
-          <td><code>99&ndash;100%</code> anytime cov, <code>6.3&ndash;10.5&times;</code> var red</td>
+          <td>Active-PPI++ (<code>N=4000</code>, RewardBench &amp; JudgeBench)</td>
+          <td><code>99&ndash;100%</code> anytime cov, <code>2.9&ndash;10.5&times;</code> var red</td>
           <td><code>ppi-python</code> peeking (<code>71.0%</code> cov) / Naive judge (<code>0.0%</code>)</td>
           <td>Exact anytime validity &amp; adversarial guard</td>
         </tr>
@@ -334,8 +343,9 @@ print(f"{report.k_judges} judges -&gt; {report.n_eff_kish:.2f} effective votes (
       </tbody>
     </table>
     <p style="font-size:0.9rem;color:var(--muted);">
-      Raw machine-verifiable receipts: <a href="benchmarks/results.json">benchmarks/results.json</a> &middot;
-      Real-world RewardBench receipts: <a href="benchmarks/rewardbench_receipts.json">benchmarks/rewardbench_receipts.json</a> &middot;
+      Raw machine-verifiable receipts: <a href="benchmarks/results.json">results.json</a> &middot;
+      <a href="benchmarks/rewardbench_receipts.json">rewardbench_receipts.json</a> &middot;
+      <a href="benchmarks/judgebench_receipts.json">judgebench_receipts.json</a> &middot;
       Full report &amp; honest scope boundaries: <a href="docs/benchmarks.md">docs/benchmarks.md</a> &middot;
       Tool matrix: <a href="docs/comparisons.md">docs/comparisons.md</a>.
     </p>

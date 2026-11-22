@@ -1,0 +1,1370 @@
+{
+  "source_dataset": "ScalerLab/JudgeBench (response_model=gpt-4o-2024-05-13)",
+  "source_url": "https://github.com/ScalerLab/JudgeBench",
+  "n_items": 350,
+  "n_strata": 3,
+  "strata_names": [
+    "mmlu",
+    "livebench",
+    "livecodebench"
+  ],
+  "models": [
+    {
+      "name": "o1-preview",
+      "family": "OpenAI",
+      "judge_name": "arena_hard",
+      "judge_model": "o1-preview-2024-09-12",
+      "swap_consistent_accuracy": 0.7085714285714285,
+      "pass0_accuracy": 0.7885714285714286
+    },
+    {
+      "name": "o1-mini",
+      "family": "OpenAI",
+      "judge_name": "arena_hard",
+      "judge_model": "o1-mini-2024-09-12",
+      "swap_consistent_accuracy": 0.58,
+      "pass0_accuracy": 0.7085714285714285
+    },
+    {
+      "name": "GPT-4o",
+      "family": "OpenAI",
+      "judge_name": "arena_hard",
+      "judge_model": "gpt-4o-2024-05-13",
+      "swap_consistent_accuracy": 0.5028571428571429,
+      "pass0_accuracy": 0.6628571428571428
+    },
+    {
+      "name": "GPT-4o-mini",
+      "family": "OpenAI",
+      "judge_name": "arena_hard",
+      "judge_model": "gpt-4o-mini-2024-07-18",
+      "swap_consistent_accuracy": 0.4828571428571429,
+      "pass0_accuracy": 0.5914285714285714
+    },
+    {
+      "name": "Claude-3.5-Sonnet",
+      "family": "Anthropic",
+      "judge_name": "arena_hard",
+      "judge_model": "claude-3-5-sonnet-20240620",
+      "swap_consistent_accuracy": 0.6,
+      "pass0_accuracy": 0.6942857142857143
+    },
+    {
+      "name": "Claude-3-Haiku",
+      "family": "Anthropic",
+      "judge_name": "arena_hard",
+      "judge_model": "claude-3-haiku-20240307",
+      "swap_consistent_accuracy": 0.16,
+      "pass0_accuracy": 0.2857142857142857
+    },
+    {
+      "name": "Gemini-1.5-Pro",
+      "family": "Google",
+      "judge_name": "arena_hard",
+      "judge_model": "gemini-1.5-pro-001",
+      "swap_consistent_accuracy": 0.4057142857142857,
+      "pass0_accuracy": 0.5628571428571428
+    },
+    {
+      "name": "Gemini-1.5-Flash",
+      "family": "Google",
+      "judge_name": "arena_hard",
+      "judge_model": "gemini-1.5-flash-001",
+      "swap_consistent_accuracy": 0.2342857142857143,
+      "pass0_accuracy": 0.4657142857142857
+    },
+    {
+      "name": "Llama-3.1-405B",
+      "family": "Meta",
+      "judge_name": "arena_hard",
+      "judge_model": "meta-llama_Meta-Llama-3.1-405B-Instruct",
+      "swap_consistent_accuracy": 0.5342857142857143,
+      "pass0_accuracy": 0.68
+    },
+    {
+      "name": "Llama-3.1-70B",
+      "family": "Meta",
+      "judge_name": "arena_hard",
+      "judge_model": "meta-llama_Meta-Llama-3.1-70B-Instruct",
+      "swap_consistent_accuracy": 0.4542857142857143,
+      "pass0_accuracy": 0.62
+    },
+    {
+      "name": "Llama-3.1-8B",
+      "family": "Meta",
+      "judge_name": "arena_hard",
+      "judge_model": "meta-llama_Meta-Llama-3.1-8B-Instruct",
+      "swap_consistent_accuracy": 0.26857142857142857,
+      "pass0_accuracy": 0.5028571428571429
+    },
+    {
+      "name": "Skywork-RM-Gemma-27B",
+      "family": "Skywork-RM",
+      "judge_name": "reward_model",
+      "judge_model": "Skywork_Skywork-Reward-Gemma-2-27B",
+      "swap_consistent_accuracy": 0.6428571428571429,
+      "pass0_accuracy": 0.6428571428571429
+    },
+    {
+      "name": "Skywork-Critic-70B",
+      "family": "Skywork-Critic",
+      "judge_name": "skywork_critic",
+      "judge_model": "Skywork_Skywork-Critic-Llama-3.1-70B",
+      "swap_consistent_accuracy": 0.5742857142857143,
+      "pass0_accuracy": 0.6914285714285714
+    }
+  ],
+  "generative_11_swap": {
+    "models": [
+      "o1-preview",
+      "o1-mini",
+      "GPT-4o",
+      "GPT-4o-mini",
+      "Claude-3.5-Sonnet",
+      "Claude-3-Haiku",
+      "Gemini-1.5-Pro",
+      "Gemini-1.5-Flash",
+      "Llama-3.1-405B",
+      "Llama-3.1-70B",
+      "Llama-3.1-8B"
+    ],
+    "k_judges": 11,
+    "audit_ms": 57.55021500226576,
+    "panel_accuracy": 0.4785714285714286,
+    "best_single_accuracy": 0.7085714285714286,
+    "condorcet_predicted_accuracy": 0.5525507142857143,
+    "condorcet_gap_pp": 7.397928571428575,
+    "permutation_p_value": 0.0004997501249375312,
+    "n_eff_kish": 3.0196746072276457,
+    "n_eff_ci95": [
+      2.7709087085870463,
+      3.327987877091128
+    ],
+    "n_eff_eigen": 2.9471553430774424,
+    "effective_rank": 8.426412237638305,
+    "krippendorff_alpha": 0.23311915067654854,
+    "mean_phi": 0.26427766003897574,
+    "within_family_mean_phi": 0.3184311111309514,
+    "cross_family_mean_phi": 0.25073929726598193,
+    "phi_matrix": [
+      [
+        1.0,
+        0.3842083232591096,
+        0.33061712468366733,
+        0.19189780335512513,
+        0.2720848207715496,
+        0.05693935235574222,
+        0.18416684375730857,
+        0.07269600887870005,
+        0.27096191632754624,
+        0.1684184535626481,
+        0.0765230293349558
+      ],
+      [
+        0.3842083232591096,
+        1.0,
+        0.32325541890213527,
+        0.25462814511926024,
+        0.32140793671439644,
+        0.15032479757189943,
+        0.24332975077352245,
+        0.10168572053857257,
+        0.29639279724358863,
+        0.2648499113945544,
+        0.05851341730655618
+      ],
+      [
+        0.33061712468366733,
+        0.32325541890213527,
+        1.0,
+        0.45761528725792366,
+        0.30794088102571987,
+        0.21572749360071825,
+        0.2978545648534181,
+        0.2531791065019684,
+        0.40055751614552304,
+        0.3333526420309457,
+        0.25439683654676065
+      ],
+      [
+        0.19189780335512513,
+        0.25462814511926024,
+        0.45761528725792366,
+        1.0,
+        0.2754379277925375,
+        0.20212625406037563,
+        0.3194502425517469,
+        0.3294599317631441,
+        0.4895046134967133,
+        0.42747743867596794,
+        0.2529942936375091
+      ],
+      [
+        0.2720848207715496,
+        0.32140793671439644,
+        0.30794088102571987,
+        0.2754379277925375,
+        1.0,
+        0.16544743546959592,
+        0.1876616914476176,
+        0.20378948478150508,
+        0.39518138042733963,
+        0.3701401664934671,
+        0.2579090258266214
+      ],
+      [
+        0.05693935235574222,
+        0.15032479757189943,
+        0.21572749360071825,
+        0.20212625406037563,
+        0.16544743546959592,
+        1.0,
+        0.2583919185225359,
+        0.20019578885486863,
+        0.2199826426793747,
+        0.19659603709947276,
+        0.1751361484609062
+      ],
+      [
+        0.18416684375730857,
+        0.24332975077352245,
+        0.2978545648534181,
+        0.3194502425517469,
+        0.1876616914476176,
+        0.2583919185225359,
+        1.0,
+        0.3397559607955876,
+        0.30481810014225713,
+        0.251155240056212,
+        0.2607654290392859
+      ],
+      [
+        0.07269600887870005,
+        0.10168572053857257,
+        0.2531791065019684,
+        0.3294599317631441,
+        0.20378948478150508,
+        0.20019578885486863,
+        0.3397559607955876,
+        1.0,
+        0.32710662148704217,
+        0.267555670966352,
+        0.2583892342037564
+      ],
+      [
+        0.27096191632754624,
+        0.29639279724358863,
+        0.40055751614552304,
+        0.4895046134967133,
+        0.39518138042733963,
+        0.2199826426793747,
+        0.30481810014225713,
+        0.32710662148704217,
+        1.0,
+        0.4722111532016946,
+        0.2555836570670732
+      ],
+      [
+        0.1684184535626481,
+        0.2648499113945544,
+        0.3333526420309457,
+        0.42747743867596794,
+        0.3701401664934671,
+        0.19659603709947276,
+        0.251155240056212,
+        0.267555670966352,
+        0.4722111532016946,
+        1.0,
+        0.32752191332929315
+      ],
+      [
+        0.0765230293349558,
+        0.05851341730655618,
+        0.25439683654676065,
+        0.2529942936375091,
+        0.2579090258266214,
+        0.1751361484609062,
+        0.2607654290392859,
+        0.2583892342037564,
+        0.2555836570670732,
+        0.32752191332929315,
+        1.0
+      ]
+    ],
+    "loo_delta_acc": [
+      -0.03428571428571431,
+      -0.008571428571428619,
+      -0.011428571428571455,
+      0.0014285714285713902,
+      -0.03142857142857147,
+      0.0471428571428571,
+      0.01571428571428568,
+      0.03999999999999998,
+      -0.008571428571428619,
+      0.0014285714285713902,
+      0.02714285714285708
+    ],
+    "loo_delta_neff": [
+      -0.1668936726505197,
+      -0.10195575238004828,
+      0.03641544597296953,
+      0.041297627640244805,
+      -0.03962968264226552,
+      -0.19392237500334675,
+      -0.058978714500186324,
+      -0.10956065417937655,
+      0.08534249168614627,
+      0.018732190008488026,
+      -0.13908180162780104
+    ]
+  },
+  "generative_11_pass0": {
+    "models": [
+      "o1-preview",
+      "o1-mini",
+      "GPT-4o",
+      "GPT-4o-mini",
+      "Claude-3.5-Sonnet",
+      "Claude-3-Haiku",
+      "Gemini-1.5-Pro",
+      "Gemini-1.5-Flash",
+      "Llama-3.1-405B",
+      "Llama-3.1-70B",
+      "Llama-3.1-8B"
+    ],
+    "k_judges": 11,
+    "audit_ms": 15.799527998751728,
+    "panel_accuracy": 0.71,
+    "best_single_accuracy": 0.7885714285714286,
+    "condorcet_predicted_accuracy": 0.8635707142857143,
+    "condorcet_gap_pp": 15.357071428571434,
+    "permutation_p_value": 0.0004997501249375312,
+    "n_eff_kish": 3.3780173837970655,
+    "n_eff_ci95": [
+      3.0524906271554957,
+      3.768519749015369
+    ],
+    "n_eff_eigen": 3.320554645087689,
+    "effective_rank": 9.031372135912887,
+    "krippendorff_alpha": 0.24483973632169354,
+    "mean_phi": 0.22563479550941307,
+    "within_family_mean_phi": 0.2472714118257655,
+    "cross_family_mean_phi": 0.22022564143032491,
+    "phi_matrix": [
+      [
+        1.0,
+        0.3146524941388843,
+        0.13397685409404572,
+        0.1390107754618543,
+        0.2943014209033735,
+        0.11063679935236803,
+        0.15025421860539837,
+        0.09065830484194684,
+        0.27480562807689507,
+        0.11359734300733865,
+        0.11491729767912592
+      ],
+      [
+        0.3146524941388843,
+        1.0,
+        0.3007357953962995,
+        0.20881472390017633,
+        0.22950878075744202,
+        0.1272489031974692,
+        0.19534674869801785,
+        0.20801116808983341,
+        0.1935526260759773,
+        0.17150406404296045,
+        0.12941565780380024
+      ],
+      [
+        0.13397685409404572,
+        0.3007357953962995,
+        1.0,
+        0.31707145213671123,
+        0.2745164119836039,
+        0.14334292665851164,
+        0.22440187253106655,
+        0.22965497905444193,
+        0.2622382672129847,
+        0.3257355061096088,
+        0.20957024348409603
+      ],
+      [
+        0.1390107754618543,
+        0.20881472390017633,
+        0.31707145213671123,
+        1.0,
+        0.3063512185540409,
+        0.2554827656267896,
+        0.3455331808262607,
+        0.2982577516207305,
+        0.32694988860432106,
+        0.2833178293483587,
+        0.2663065831440542
+      ],
+      [
+        0.2943014209033735,
+        0.22950878075744202,
+        0.2745164119836039,
+        0.3063512185540409,
+        1.0,
+        0.22749034198808923,
+        0.2528704364824157,
+        0.19682421093941815,
+        0.4089421349601111,
+        0.3493138790707093,
+        0.18364175095984794
+      ],
+      [
+        0.11063679935236803,
+        0.1272489031974692,
+        0.14334292665851164,
+        0.2554827656267896,
+        0.22749034198808923,
+        1.0,
+        0.17486077727803237,
+        0.18293919694409574,
+        0.16269784336399198,
+        0.09120956670998234,
+        0.19877498397150864
+      ],
+      [
+        0.15025421860539837,
+        0.19534674869801785,
+        0.22440187253106655,
+        0.3455331808262607,
+        0.2528704364824157,
+        0.17486077727803237,
+        1.0,
+        0.21078487965201334,
+        0.24745113103117547,
+        0.20007420447134497,
+        0.14903786879991313
+      ],
+      [
+        0.09065830484194684,
+        0.20801116808983341,
+        0.22965497905444193,
+        0.2982577516207305,
+        0.19682421093941815,
+        0.18293919694409574,
+        0.21078487965201334,
+        1.0,
+        0.27209822271432205,
+        0.1998992466725463,
+        0.26387438267406493
+      ],
+      [
+        0.27480562807689507,
+        0.1935526260759773,
+        0.2622382672129847,
+        0.32694988860432106,
+        0.4089421349601111,
+        0.16269784336399198,
+        0.24745113103117547,
+        0.27209822271432205,
+        1.0,
+        0.3967321578616451,
+        0.23667191155941483
+      ],
+      [
+        0.11359734300733865,
+        0.17150406404296045,
+        0.3257355061096088,
+        0.2833178293483587,
+        0.3493138790707093,
+        0.09120956670998234,
+        0.20007420447134497,
+        0.1998992466725463,
+        0.3967321578616451,
+        1.0,
+        0.23404414389428674
+      ],
+      [
+        0.11491729767912592,
+        0.12941565780380024,
+        0.20957024348409603,
+        0.2663065831440542,
+        0.18364175095984794,
+        0.19877498397150864,
+        0.14903786879991313,
+        0.26387438267406493,
+        0.23667191155941483,
+        0.23404414389428674,
+        1.0
+      ]
+    ],
+    "loo_delta_acc": [
+      -0.020000000000000018,
+      -0.024285714285714244,
+      0.0,
+      0.014285714285714346,
+      -0.0028571428571427804,
+      0.0128571428571429,
+      0.004285714285714337,
+      0.0128571428571429,
+      -0.010000000000000009,
+      -0.0028571428571427804,
+      0.008571428571428563
+    ],
+    "loo_delta_neff": [
+      -0.18783856456156878,
+      -0.11667764489527999,
+      -0.04216424582380851,
+      0.03196843333952559,
+      0.02655013183595356,
+      -0.20043427133276737,
+      -0.10132676698019916,
+      -0.10081411132892226,
+      0.04013770936800842,
+      -0.054540554785947215,
+      -0.1362444536504932
+    ]
+  },
+  "top7_cross_family_swap": {
+    "models": [
+      "o1-preview",
+      "o1-mini",
+      "GPT-4o",
+      "Claude-3.5-Sonnet",
+      "Gemini-1.5-Pro",
+      "Llama-3.1-405B",
+      "Skywork-RM-Gemma-27B"
+    ],
+    "k_judges": 7,
+    "audit_ms": 12.38589200147544,
+    "panel_accuracy": 0.6657142857142857,
+    "best_single_accuracy": 0.7085714285714286,
+    "condorcet_predicted_accuracy": 0.778567857142857,
+    "condorcet_gap_pp": 11.285357142857134,
+    "permutation_p_value": 0.0004997501249375312,
+    "n_eff_kish": 2.493672282592856,
+    "n_eff_ci95": [
+      2.2939224589480722,
+      2.768892291449194
+    ],
+    "n_eff_eigen": 2.4813957453105244,
+    "effective_rank": 5.6622280995608305,
+    "krippendorff_alpha": 0.303078232091496,
+    "mean_phi": 0.30118417115617546,
+    "within_family_mean_phi": 0.3460269556149707,
+    "cross_family_mean_phi": 0.29371037374637626,
+    "phi_matrix": [
+      [
+        1.0,
+        0.3842083232591096,
+        0.33061712468366733,
+        0.2720848207715496,
+        0.18416684375730857,
+        0.27096191632754624,
+        0.2043263186686132
+      ],
+      [
+        0.3842083232591096,
+        1.0,
+        0.32325541890213527,
+        0.32140793671439644,
+        0.24332975077352245,
+        0.29639279724358863,
+        0.27183014110978115
+      ],
+      [
+        0.33061712468366733,
+        0.32325541890213527,
+        1.0,
+        0.30794088102571987,
+        0.2978545648534181,
+        0.40055751614552304,
+        0.3441471284544634
+      ],
+      [
+        0.2720848207715496,
+        0.32140793671439644,
+        0.30794088102571987,
+        1.0,
+        0.1876616914476176,
+        0.39518138042733963,
+        0.27994708494708487
+      ],
+      [
+        0.18416684375730857,
+        0.24332975077352245,
+        0.2978545648534181,
+        0.1876616914476176,
+        1.0,
+        0.30481810014225713,
+        0.3122629111456237
+      ],
+      [
+        0.27096191632754624,
+        0.29639279724358863,
+        0.40055751614552304,
+        0.39518138042733963,
+        0.30481810014225713,
+        1.0,
+        0.39191494347941924
+      ],
+      [
+        0.2043263186686132,
+        0.27183014110978115,
+        0.3441471284544634,
+        0.27994708494708487,
+        0.3122629111456237,
+        0.39191494347941924,
+        1.0
+      ]
+    ],
+    "loo_delta_acc": [
+      -0.04666666666666641,
+      -0.03428571428571414,
+      0.0019047619047619646,
+      -0.020952380952380723,
+      0.014285714285714346,
+      0.01619047619047631,
+      -0.04190476190476189
+    ],
+    "loo_delta_neff": [
+      -0.1494651154368407,
+      -0.08868376764176977,
+      -0.0348221504875883,
+      -0.11292264292468834,
+      -0.18443270508786647,
+      -0.016053760222013214,
+      -0.10019500807546144
+    ]
+  },
+  "top7_cross_family_pass0": {
+    "models": [
+      "o1-preview",
+      "o1-mini",
+      "GPT-4o",
+      "Claude-3.5-Sonnet",
+      "Gemini-1.5-Pro",
+      "Llama-3.1-405B",
+      "Skywork-RM-Gemma-27B"
+    ],
+    "k_judges": 7,
+    "audit_ms": 9.157811000477523,
+    "panel_accuracy": 0.7671428571428571,
+    "best_single_accuracy": 0.7885714285714286,
+    "condorcet_predicted_accuracy": 0.8742592857142857,
+    "condorcet_gap_pp": 10.711642857142856,
+    "permutation_p_value": 0.0004997501249375312,
+    "n_eff_kish": 2.75472395172002,
+    "n_eff_ci95": [
+      2.468213882361623,
+      3.0989141613942808
+    ],
+    "n_eff_eigen": 2.7425570918535636,
+    "effective_rank": 5.947508807686893,
+    "krippendorff_alpha": 0.3481947506372908,
+    "mean_phi": 0.2568482433983555,
+    "within_family_mean_phi": 0.24978838120974317,
+    "cross_family_mean_phi": 0.2580248870964576,
+    "phi_matrix": [
+      [
+        1.0,
+        0.3146524941388843,
+        0.13397685409404572,
+        0.2943014209033735,
+        0.15025421860539837,
+        0.27480562807689507,
+        0.18358449957955922
+      ],
+      [
+        0.3146524941388843,
+        1.0,
+        0.3007357953962995,
+        0.22950878075744202,
+        0.19534674869801785,
+        0.1935526260759773,
+        0.2699356870484431
+      ],
+      [
+        0.13397685409404572,
+        0.3007357953962995,
+        1.0,
+        0.2745164119836039,
+        0.22440187253106655,
+        0.2622382672129847,
+        0.32614995095182375
+      ],
+      [
+        0.2943014209033735,
+        0.22950878075744202,
+        0.2745164119836039,
+        1.0,
+        0.2528704364824157,
+        0.4089421349601111,
+        0.26902442167241014
+      ],
+      [
+        0.15025421860539837,
+        0.19534674869801785,
+        0.22440187253106655,
+        0.2528704364824157,
+        1.0,
+        0.24745113103117547,
+        0.28077773562659086
+      ],
+      [
+        0.27480562807689507,
+        0.1935526260759773,
+        0.2622382672129847,
+        0.4089421349601111,
+        0.24745113103117547,
+        1.0,
+        0.30678599553894814
+      ],
+      [
+        0.18358449957955922,
+        0.2699356870484431,
+        0.32614995095182375,
+        0.26902442167241014,
+        0.28077773562659086,
+        0.30678599553894814,
+        1.0
+      ]
+    ],
+    "loo_delta_acc": [
+      -0.036666666666666625,
+      -0.036190476190476106,
+      -0.0014285714285714457,
+      0.0,
+      0.0023809523809523725,
+      -0.0023809523809524835,
+      0.0028571428571426694
+    ],
+    "loo_delta_neff": [
+      -0.19871831681992447,
+      -0.14227279850319796,
+      -0.1353206187791498,
+      -0.05390675382240451,
+      -0.1988899723351114,
+      -0.06817175543365828,
+      -0.09103856892416795
+    ]
+  },
+  "frontier_13_pruning_swap": [
+    {
+      "k": 13,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Claude-3-Haiku",
+        "Gemini-1.5-Pro",
+        "Gemini-1.5-Flash",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Llama-3.1-8B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.5214285714285715,
+      "n_eff_kish": 2.9810063148381136,
+      "mean_phi": 0.2800786218648108,
+      "dropped_next": "Claude-3-Haiku",
+      "dropped_loo_delta_acc": 0.033809523809523845,
+      "cost_savings_pct": 0.0
+    },
+    {
+      "k": 12,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Gemini-1.5-Pro",
+        "Gemini-1.5-Flash",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Llama-3.1-8B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.5552380952380953,
+      "n_eff_kish": 2.811598903583196,
+      "mean_phi": 0.2970940092197361,
+      "dropped_next": "Gemini-1.5-Flash",
+      "dropped_loo_delta_acc": 0.026190476190476097,
+      "cost_savings_pct": 7.692307692307687
+    },
+    {
+      "k": 11,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Llama-3.1-8B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.5814285714285714,
+      "n_eff_kish": 2.702801116649471,
+      "mean_phi": 0.3069851803833853,
+      "dropped_next": "Llama-3.1-8B",
+      "dropped_loo_delta_acc": 0.02857142857142858,
+      "cost_savings_pct": 15.384615384615385
+    },
+    {
+      "k": 10,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.61,
+      "n_eff_kish": 2.54205873708244,
+      "mean_phi": 0.3259799343878416,
+      "dropped_next": "GPT-4o",
+      "dropped_loo_delta_acc": 0.024285714285714466,
+      "cost_savings_pct": 23.076923076923073
+    },
+    {
+      "k": 9,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.6342857142857145,
+      "n_eff_kish": 2.530492383888913,
+      "mean_phi": 0.31957750877363905,
+      "dropped_next": "Llama-3.1-70B",
+      "dropped_loo_delta_acc": 0.019999999999999796,
+      "cost_savings_pct": 30.76923076923077
+    },
+    {
+      "k": 8,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.6542857142857142,
+      "n_eff_kish": 2.5131834578112184,
+      "mean_phi": 0.31188767066016393,
+      "dropped_next": "GPT-4o-mini",
+      "dropped_loo_delta_acc": 0.0257142857142858,
+      "cost_savings_pct": 38.46153846153846
+    },
+    {
+      "k": 7,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "Claude-3.5-Sonnet",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.68,
+      "n_eff_kish": 2.4892438130353347,
+      "mean_phi": 0.30201649749637144,
+      "dropped_next": "Gemini-1.5-Pro",
+      "dropped_loo_delta_acc": 0.015238095238095384,
+      "cost_savings_pct": 46.15384615384615
+    },
+    {
+      "k": 6,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "Claude-3.5-Sonnet",
+        "Llama-3.1-405B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.6952380952380954,
+      "n_eff_kish": 2.3255849655709073,
+      "mean_phi": 0.31599920784034324,
+      "dropped_next": "Llama-3.1-405B",
+      "dropped_loo_delta_acc": 0.006190476190475969,
+      "cost_savings_pct": 53.84615384615385
+    },
+    {
+      "k": 5,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "Claude-3.5-Sonnet",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.7014285714285714,
+      "n_eff_kish": 2.293630314352457,
+      "mean_phi": 0.2949875649872996,
+      "dropped_next": "Skywork-Critic-70B",
+      "dropped_loo_delta_acc": 0.0014285714285714457,
+      "cost_savings_pct": 61.53846153846154
+    },
+    {
+      "k": 4,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "Claude-3.5-Sonnet",
+        "Skywork-RM-Gemma-27B"
+      ],
+      "panel_accuracy": 0.7028571428571428,
+      "n_eff_kish": 2.1425866649334493,
+      "mean_phi": 0.28896743757842247,
+      "dropped_next": "o1-mini",
+      "dropped_loo_delta_acc": 0.011428571428571899,
+      "cost_savings_pct": 69.23076923076923
+    },
+    {
+      "k": 3,
+      "kept": [
+        "o1-preview",
+        "Claude-3.5-Sonnet",
+        "Skywork-RM-Gemma-27B"
+      ],
+      "panel_accuracy": 0.7142857142857147,
+      "n_eff_kish": 1.994364171151082,
+      "mean_phi": 0.25211940812908257,
+      "dropped_next": "Claude-3.5-Sonnet",
+      "dropped_loo_delta_acc": -0.038571428571429034,
+      "cost_savings_pct": 76.92307692307692
+    },
+    {
+      "k": 2,
+      "kept": [
+        "o1-preview",
+        "Skywork-RM-Gemma-27B"
+      ],
+      "panel_accuracy": 0.6757142857142857,
+      "n_eff_kish": 1.6606794761497918,
+      "mean_phi": 0.2043263186686132,
+      "dropped_next": "Skywork-RM-Gemma-27B",
+      "dropped_loo_delta_acc": 0.03285714285714281,
+      "cost_savings_pct": 84.61538461538461
+    },
+    {
+      "k": 1,
+      "kept": [
+        "o1-preview"
+      ],
+      "panel_accuracy": 0.7085714285714285,
+      "n_eff_kish": 1.0,
+      "mean_phi": 0.0,
+      "dropped_next": null,
+      "cost_savings_pct": 92.3076923076923
+    }
+  ],
+  "frontier_13_pruning_pass0": [
+    {
+      "k": 13,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Claude-3-Haiku",
+        "Gemini-1.5-Pro",
+        "Gemini-1.5-Flash",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Llama-3.1-8B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.7142857142857143,
+      "n_eff_kish": 3.3077196828623876,
+      "mean_phi": 0.24418333591351582,
+      "dropped_next": "Gemini-1.5-Flash",
+      "dropped_loo_delta_acc": 0.01285714285714279,
+      "cost_savings_pct": 0.0
+    },
+    {
+      "k": 12,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Claude-3-Haiku",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Llama-3.1-8B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.7271428571428571,
+      "n_eff_kish": 3.2213593082649297,
+      "mean_phi": 0.24773959323805883,
+      "dropped_next": "Llama-3.1-8B",
+      "dropped_loo_delta_acc": 0.0128571428571429,
+      "cost_savings_pct": 7.692307692307687
+    },
+    {
+      "k": 11,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Claude-3-Haiku",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.74,
+      "n_eff_kish": 3.0844150506774097,
+      "mean_phi": 0.256631640660168,
+      "dropped_next": "Claude-3-Haiku",
+      "dropped_loo_delta_acc": 0.0028571428571428914,
+      "cost_savings_pct": 15.384615384615385
+    },
+    {
+      "k": 10,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "GPT-4o-mini",
+        "Claude-3.5-Sonnet",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.7428571428571429,
+      "n_eff_kish": 2.8694226252414707,
+      "mean_phi": 0.27611351775219817,
+      "dropped_next": "GPT-4o-mini",
+      "dropped_loo_delta_acc": 0.008571428571428563,
+      "cost_savings_pct": 23.076923076923073
+    },
+    {
+      "k": 9,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "Claude-3.5-Sonnet",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.7514285714285714,
+      "n_eff_kish": 2.840200930843143,
+      "mean_phi": 0.2710987364601814,
+      "dropped_next": "Claude-3.5-Sonnet",
+      "dropped_loo_delta_acc": 0.011428571428571455,
+      "cost_savings_pct": 30.76923076923077
+    },
+    {
+      "k": 8,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Llama-3.1-70B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.7628571428571429,
+      "n_eff_kish": 2.8071759360772814,
+      "mean_phi": 0.2642627416393592,
+      "dropped_next": "Llama-3.1-70B",
+      "dropped_loo_delta_acc": 0.010000000000000009,
+      "cost_savings_pct": 38.46153846153846
+    },
+    {
+      "k": 7,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Skywork-RM-Gemma-27B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.7728571428571429,
+      "n_eff_kish": 2.6826667123352985,
+      "mean_phi": 0.2682239819935492,
+      "dropped_next": "Skywork-RM-Gemma-27B",
+      "dropped_loo_delta_acc": 0.006666666666666599,
+      "cost_savings_pct": 46.15384615384615
+    },
+    {
+      "k": 6,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "Gemini-1.5-Pro",
+        "Llama-3.1-405B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.7795238095238095,
+      "n_eff_kish": 2.6692110110580374,
+      "mean_phi": 0.24957105115655015,
+      "dropped_next": "Gemini-1.5-Pro",
+      "dropped_loo_delta_acc": 0.010476190476190528,
+      "cost_savings_pct": 53.84615384615385
+    },
+    {
+      "k": 5,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "GPT-4o",
+        "Llama-3.1-405B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.79,
+      "n_eff_kish": 2.4309908710177126,
+      "mean_phi": 0.264193621581433,
+      "dropped_next": "GPT-4o",
+      "dropped_loo_delta_acc": 0.0,
+      "cost_savings_pct": 61.53846153846154
+    },
+    {
+      "k": 4,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "Llama-3.1-405B",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.79,
+      "n_eff_kish": 2.240323625352244,
+      "mean_phi": 0.261818776944348,
+      "dropped_next": "Llama-3.1-405B",
+      "dropped_loo_delta_acc": 0.0033333333333332993,
+      "cost_savings_pct": 69.23076923076923
+    },
+    {
+      "k": 3,
+      "kept": [
+        "o1-preview",
+        "o1-mini",
+        "Skywork-Critic-70B"
+      ],
+      "panel_accuracy": 0.7933333333333333,
+      "n_eff_kish": 2.0220779264074875,
+      "mean_phi": 0.2418111737488604,
+      "dropped_next": "Skywork-Critic-70B",
+      "dropped_loo_delta_acc": -0.04476190476190478,
+      "cost_savings_pct": 76.92307692307692
+    },
+    {
+      "k": 2,
+      "kept": [
+        "o1-preview",
+        "o1-mini"
+      ],
+      "panel_accuracy": 0.7485714285714286,
+      "n_eff_kish": 1.5213145747006156,
+      "mean_phi": 0.3146524941388843,
+      "dropped_next": "o1-mini",
+      "dropped_loo_delta_acc": 0.040000000000000036,
+      "cost_savings_pct": 84.61538461538461
+    },
+    {
+      "k": 1,
+      "kept": [
+        "o1-preview"
+      ],
+      "panel_accuracy": 0.7885714285714286,
+      "n_eff_kish": 1.0,
+      "mean_phi": 0.0,
+      "dropped_next": null,
+      "cost_savings_pct": 92.3076923076923
+    }
+  ],
+  "cv5_out_of_sample_swap": {
+    "n_folds": 5,
+    "target_k": 3,
+    "cost_savings_pct": 76.92307692307692,
+    "mean_full_test_accuracy": 0.5214285714285715,
+    "mean_pruned_test_accuracy": 0.7047619047619048,
+    "out_of_sample_gain_pp": 18.333333333333336,
+    "fold_full_accuracies": [
+      0.5857142857142857,
+      0.4714285714285714,
+      0.4857142857142857,
+      0.5928571428571429,
+      0.4714285714285714
+    ],
+    "fold_pruned_accuracies": [
+      0.7571428571428572,
+      0.6761904761904762,
+      0.6714285714285715,
+      0.7285714285714286,
+      0.6904761904761906
+    ],
+    "selected_subsets_per_fold": [
+      [
+        "o1-preview",
+        "Claude-3.5-Sonnet",
+        "Skywork-RM-Gemma-27B"
+      ],
+      [
+        "o1-preview",
+        "o1-mini",
+        "Skywork-RM-Gemma-27B"
+      ],
+      [
+        "o1-preview",
+        "o1-mini",
+        "Skywork-RM-Gemma-27B"
+      ],
+      [
+        "o1-preview",
+        "Claude-3.5-Sonnet",
+        "Skywork-RM-Gemma-27B"
+      ],
+      [
+        "o1-preview",
+        "Claude-3.5-Sonnet",
+        "Skywork-RM-Gemma-27B"
+      ]
+    ]
+  },
+  "cv5_out_of_sample_pass0": {
+    "n_folds": 5,
+    "target_k": 3,
+    "cost_savings_pct": 76.92307692307692,
+    "mean_full_test_accuracy": 0.7142857142857143,
+    "mean_pruned_test_accuracy": 0.7857142857142857,
+    "out_of_sample_gain_pp": 7.14285714285714,
+    "fold_full_accuracies": [
+      0.6857142857142857,
+      0.6642857142857143,
+      0.7357142857142858,
+      0.7642857142857142,
+      0.7214285714285714
+    ],
+    "fold_pruned_accuracies": [
+      0.7714285714285715,
+      0.7666666666666666,
+      0.7952380952380952,
+      0.8571428571428571,
+      0.7380952380952381
+    ],
+    "selected_subsets_per_fold": [
+      [
+        "o1-preview",
+        "o1-mini",
+        "Skywork-Critic-70B"
+      ],
+      [
+        "o1-preview",
+        "o1-mini",
+        "Llama-3.1-405B"
+      ],
+      [
+        "o1-preview",
+        "o1-mini",
+        "Skywork-Critic-70B"
+      ],
+      [
+        "o1-preview",
+        "o1-mini",
+        "Skywork-Critic-70B"
+      ],
+      [
+        "o1-preview",
+        "o1-mini",
+        "Llama-3.1-405B"
+      ]
+    ]
+  },
+  "paired_agent_race_top6": {
+    "models": [
+      "o1-preview",
+      "Skywork-RM-Gemma-27B",
+      "Claude-3.5-Sonnet",
+      "o1-mini",
+      "Skywork-Critic-70B",
+      "Llama-3.1-405B"
+    ],
+    "true_winner": "o1-preview",
+    "n_trials": 50,
+    "full_budget_evals": 2100,
+    "mean_evals": 1646.54,
+    "median_evals": 1679.5,
+    "pct_evals_saved": 21.59333333333333,
+    "certified_rate": 0.02,
+    "winner_accuracy": 1.0
+  },
+  "active_ppi_gpt4o_to_o1_preview": {
+    "proxy_model": "GPT-4o",
+    "target_model": "o1-preview",
+    "n_trials": 50,
+    "audit_rate": 0.2,
+    "true_target_accuracy": 0.7085714285714285,
+    "naive_proxy_accuracy": 0.5028571428571429,
+    "naive_proxy_bias_pp": -20.571428571428562,
+    "anytime_coverage_all_350_steps": 1.0,
+    "mean_final_width_ppi": 0.44595101258520115,
+    "mean_final_width_human_only": 0.3363485268755471,
+    "mean_variance_reduction": 2.90280223232994
+  },
+  "playground_preset": {
+    "n_items": 350,
+    "k_judges": 13,
+    "model_names": [
+      "o1-preview",
+      "o1-mini",
+      "GPT-4o",
+      "GPT-4o-mini",
+      "Claude-3.5-Sonnet",
+      "Claude-3-Haiku",
+      "Gemini-1.5-Pro",
+      "Gemini-1.5-Flash",
+      "Llama-3.1-405B",
+      "Llama-3.1-70B",
+      "Llama-3.1-8B",
+      "Skywork-RM-Gemma-27B",
+      "Skywork-Critic-70B"
+    ],
+    "votes_2bit_b64": "QBgmVWBWqaKogoAKCFRVVSEmCoGACIApKlQaqWlVZZVVllUWFomIlqhppKWWlQABQFZaVVmoWIEgYFCVVZVVZVUVVWlVpZYlAAIgEoICUqkgKKCABIAoAJKmUFUZBVVlFVVVKZZqggWAoGoCIgCgkikCVmpZAIggKQFapYqQRUKKWgYIIJRlVlUpqlZZZFoACGCQJgihmpoSAgVUAgZlEIpqUJGYAhpqqaBqJkggWlGlUZUopghWWVqZVVWVlqoWFAAIVVpVRYgYIKAqQJFmCSlqAiQgqqCkqmZValkqmmEREoKQVlkUACIAVSlVVWGlBACEAiqiSlpZFSWVAWlVWlVpapZVlVVRmWWlmVkBhioKoIggVGaSZaIaAgIAAAEIIFZlaWVQIAZkqkkAgAAYZqFVVVlVAqIKkIoIVkQkWKZZFACqSAAIAJApagmACEBZVVppqGKCYokJogACAAIAZSkFVWWaBQAAQFlVVaqKaiVoJlGKAFZqVkopKCKAkqKlgIKiaiRGVVVllaaKWVVWUpYqiAgIAFRmllVqWBKUZlUKKAiYoKIAAApCSamKAAgCiKQiUJVWVYhqAACAAAAIgKBpWQYAIAgACCAIqaaFlqigmVWSViVViQIAWKValCgimoCaaoGiCpBVVREampqAqCAAIAAAAAKAgoIIVZlJqSqgAGVYFSCqiqCaaKamilComQISGggKpCAAAIIAgIACACIKAKoogGJqWKVVFYaqmFVZZVWqpoWVqgYkqklVVVVVZZUlhZoWgAKIAAAAVFWVhYiggIiimmWZVQEomgCABgIKIgKqqqoBqJpVVVkVACIAYIgalqWWVZmpVmWqWlhWZVZlVZWVWhYIAghVVmmBIIIAggpgVWVVAKggqCiiYaqqlioqSFWhWQEgIFClmVaWYlkIKACUJppVlVpCgCAEZallgaFRqYoCYEEikACoICAIloCmlhYgopZaVllVpZilqqoCAgIClVpVqaIikJAqhgAKAGKAYplmgqlpqhYAYgopqVWlWqkFiAhCVWVVgKoqFmVWBaopIimqCCWpZWJlVkWARmRVpIJgiioAIIKQVVlVZqZVAIgAYICQYJlVVapqCoABKAAgAqCCigIACglgqEqlqlalqmgWklZZVZVlpaqGAISlYhIoUlVZVVUWVoWGiiIAAgBQilIBKIKAYUkmGBVagKgoZmVVhYQKIGapWmplFiWllgipiEJVZllUWVUBAACgpooFiAqKaVpagamKCQAIQFVIAigoJGhqKiWWqgEQqoWAaFhkZVVVlZUWFaZZAqoaAAAAAIopZlVpVmqoaiFhYpiZmlVVooYiqCAAqEJQCmBUVWZZSFllWaKmgaaaamUCRWkKIGSllgWACkFValkAoihkaaaBiqJmZWpZAKgoAGGpCYCIIFBqWmqoIVallpWpKgYUmlJWqSpWoiBggqiAJipaZaoKoKKhqYaioqpqWVCZFQKggFChAkJVZlYAKiCAolWJVVZBimpKoKhggGFUBQ==",
+    "gold_1bit_b64": "AOY7+shoRPJekWnlgrCeb2oExREENCdBfunlCXq2kswAOSA7KZbNuAp2zQg=",
+    "strata_2bit_b64": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqqqqCg=="
+  }
+}

@@ -3,17 +3,19 @@
 [![CI](https://github.com/pgg898200-ship-it/cloture/actions/workflows/ci.yml/badge.svg)](https://github.com/pgg898200-ship-it/cloture/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/cloture?color=38d9c0)](https://pypi.org/project/cloture/)
 [![Live WASM Playground](https://img.shields.io/badge/Live_Playground-243KB_Rust_WASM-38d9c0)](https://pgg898200-ship-it.github.io/cloture/playground.html)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pgg898200-ship-it/cloture/blob/main/examples/cloture_frontier_eval_colab.ipynb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Zero External Crates](https://img.shields.io/badge/Rust_Deps-0_external_crates-brightgreen)](Cargo.lock)
 [![Zero Python Deps](https://img.shields.io/badge/Python_Runtime_Deps-0-brightgreen)](pyproject.toml)
 
 **End the multi-agent debate the millisecond the math proves who won — and catch when your judge panel is 2 correlated votes wearing 9 trench coats.**
 
-> **Try it now with zero install:** [**Live Browser Playground (`243 KB` / `81 KB` gzipped zero-import Rust WebAssembly)**](https://pgg898200-ship-it.github.io/cloture/playground.html) — click **"Real RewardBench (11 LLMs × 2,985)"**, paste your own judge CSV privately (zero backend upload), run live Monte Carlo stopping races, or stress-test `ActivePPI` under adversarial judge inversion.
+> **Try it now with zero install:** [**Live Browser Playground (`243 KB` / `81 KB` gzipped zero-import Rust WebAssembly)**](https://pgg898200-ship-it.github.io/cloture/playground.html) — load real **AllenAI RewardBench (11 LLMs × 2,985)** or **ScalerLab JudgeBench (13 LLMs × 350 incl. `o1-preview` & `Claude-3.5-Sonnet`)** in 1 click, paste your own CSV privately, or launch the [**15-Second Google Colab Walkthrough**](https://colab.research.google.com/github/pgg898200-ship-it/cloture/blob/main/examples/cloture_frontier_eval_colab.ipynb).
 
 `cloture` is a zero-dependency Rust core (`cloture-core`) + single `2.91 MiB` static CLI/MCP binary (`cloture`) + zero-dependency Python SDK (`cloture`) + `243 KB` zero-import WebAssembly JS/TS SDK (`js/cloture.mjs`) + C ABI (`include/cloture.h`) for **sub-microsecond anytime-valid consensus stopping, correlated-panel auditing, sequential agent racing, active prediction-powered evaluation, poisoning-resistant fusion, and distributed `<1 KB` evidence monoids**.
 
 ![Real-world AllenAI RewardBench frontier judge collapse, LOO pruning, and paired racing](docs/assets/rewardbench_real_world.svg)
+![Real-world ScalerLab JudgeBench 13-model pruning and Top-7 cross-family error correlation heatmap](docs/assets/judgebench_real_world.svg)
 
 - **Zero external Rust crates** (`Cargo.lock` is 15 lines; `std` only).
 - **Zero Python runtime dependencies** (`import cloture` cold-starts in `24.8 ms` vs `201 ms` NumPy / `849 ms` SciPy / `2,075 ms` `ppi_py`).
@@ -24,14 +26,18 @@
 
 ---
 
-## Real-World Frontier Receipt: AllenAI RewardBench (`2,985` Items, `11` Models, `23` Strata)
+## Real-World Frontier Receipts: RewardBench (`2,985` Items) & JudgeBench (`350` Objective Items)
 
-We evaluated `cloture` directly on official per-item verdicts from [`allenai/reward-bench-results`](https://huggingface.co/datasets/allenai/reward-bench-results) (zero synthetic data — full report in [`docs/REAL_WORLD_EVAL.md`](docs/REAL_WORLD_EVAL.md), reproduce with `python3 benchmarks/real_world_rewardbench.py`):
+Evaluated directly on official public verdicts from [`allenai/reward-bench-results`](https://huggingface.co/datasets/allenai/reward-bench-results) and [`ScalerLab/JudgeBench`](https://github.com/ScalerLab/JudgeBench) with **zero synthetic data** and **strict 5-fold out-of-sample cross-validation** (full report: [`docs/REAL_WORLD_EVAL.md`](docs/REAL_WORLD_EVAL.md)):
 
-- **7 Frontier Generative LLMs (`GPT-4o ×2`, `GPT-4o-mini`, `Gemini-1.5-Flash`, `Llama-3.1-405B/70B`, `Gemma-2-27B`) deliver only `2.21` effective independent votes** (`95% CI [2.11, 2.31]`, `+4.65 pp` Condorcet illusion gap, `p = 0.00050`, audited in `67.2 ms`). Within-family error correlation is **`φ = 0.504`** (`GPT-4o` pair `0.587`) vs. cross-family **`φ = 0.317`**.
-- **Pruning 8 of 11 frontier models (`11 → 3`) raises accuracy `+3.85 pp` (`92.03% → 95.88%`) at `-72.7%` lower API cost** — beating the single best model (`Skywork-Gemma-27B-RM`, `94.97%`) by `+0.90 pp`.
-- **Real 6-model paired `AgentRace`:** Certified the true winner (`GPT-4o 2024-08`) on **`50 / 50` (`100%`)** shuffled RewardBench streams while saving **`80.4%` of model evaluations** (`3,513` vs. `17,910`).
-- **Real `Active-PPI++` (`GPT-4o-mini` proxy → `GPT-4o`, 10% audit):** **`100%` anytime coverage across all `2,985` sequential steps** (`10.46×` variance reduction) while eliminating `-12.41 pp` proxy bias.
+- **AllenAI RewardBench (`2,985` items, `23` strata, `11` models):**
+  - 7 generative frontier LLMs (`GPT-4o ×2`, `GPT-4o-mini`, `Gemini-1.5-Flash`, `Llama-3.1-405B/70B`, `Gemma-2-27B`) deliver only **`2.21` effective votes** (`95% CI [2.11, 2.31]`, within-family $\bar{\phi} = 0.504$ vs. cross-family $0.317$, `p = 0.00050`, audited in `67.2 ms`).
+  - Pruning `11 → 3` raises accuracy **`+3.85 pp` (`92.03% → 95.88%`)** — **`+3.65 pp` strictly out-of-sample (5-fold CV)**, beating the best single model (`94.97%`) — at **`-72.7%` lower API cost**.
+  - Paired `AgentRace` certifies `GPT-4o` on **`50 / 50` (`100%`)** runs saving **`80.4%` of evals**; `Active-PPI++` holds **`100%` anytime coverage** (`10.46×` var reduction, removing `-12.41 pp` bias).
+- **ScalerLab JudgeBench (`350` objective MMLU-Pro/LiveBench/LiveCodeBench items, `13` models across 5 labs):**
+  - Even picking the **Top-7 models from 5 different labs** (`o1-preview`, `o1-mini`, `GPT-4o`, `Claude-3.5-Sonnet`, `Gemini-1.5-Pro`, `Llama-3.1-405B`, `Skywork-RM-Gemma-27B`) collapses to **`n_eff = 2.49 / 7`** (`+11.29 pp` Condorcet gap); single-pass 11 generative LLMs show a **`+15.36 pp`** Condorcet collapse (`86.36%` predicted vs. `71.00%` actual).
+  - Pruning `13 → 3` (`o1-preview + Claude-3.5-Sonnet + Skywork-RM-Gemma-27B`) raises accuracy **`+19.29 pp` (`52.14% → 71.43%`, beating `o1-preview` `70.86%`)** — verified **`+18.33 pp` strictly out-of-sample (5-fold CV)** (Pass-0: **`+7.14 pp` OOS CV**) — at **`-76.9%` lower API cost**!
+  - Real `Active-PPI++` (`GPT-4o` proxy → `o1-preview`, 20% audit): **`100%` anytime coverage across all `350` steps** (`2.90×` var reduction, removing `-20.57 pp` proxy bias).
 
 ---
 

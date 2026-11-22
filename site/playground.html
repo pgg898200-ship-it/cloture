@@ -114,6 +114,7 @@
           <div class="btn-row">
             <button class="primary" id="btn-run-panel">Run WASM Audit</button>
             <button class="secondary" id="btn-preset-rewardbench" style="border-color:var(--accent);color:var(--accent);">Real RewardBench (11 LLMs × 2,985)</button>
+            <button class="secondary" id="btn-preset-judgebench" style="border-color:var(--accent2);color:var(--accent2);">Real JudgeBench (13 LLMs × 350 · o1 + Claude-3.5)</button>
             <button class="secondary" id="btn-preset-indep">Independent Judges</button>
             <button class="secondary" id="btn-preset-clones">Cloned Judges</button>
           </div>
@@ -506,11 +507,56 @@
       }
     }
 
+    async function runRealJudgeBench() {
+      if (!cloture) return;
+      const btn = document.getElementById("btn-preset-judgebench");
+      btn.textContent = "Loading 350 items…";
+      try {
+        const resp = await fetch("./benchmarks/judgebench_receipts.json");
+        const jb = await resp.json();
+        const p = jb.playground_preset;
+        const decodeBytes = (b64) => {
+          const bin = atob(b64);
+          const arr = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+          return arr;
+        };
+        const vBytes = decodeBytes(p.votes_2bit_b64);
+        const gBytes = decodeBytes(p.gold_1bit_b64);
+        const sBytes = decodeBytes(p.strata_2bit_b64);
+        const N = p.n_items;
+        const K = p.k_judges;
+        const votes = [];
+        const gold = new Array(N);
+        const strata = new Array(N);
+        let idx = 0;
+        for (let i = 0; i < N; i++) {
+          gold[i] = (gBytes[i >> 3] >> (i & 7)) & 1;
+          strata[i] = (sBytes[i >> 2] >> ((i & 3) * 2)) & 3;
+          const row = new Array(K);
+          for (let j = 0; j < K; j++) {
+            row[j] = (vBytes[idx >> 2] >> ((idx & 3) * 2)) & 3;
+            idx++;
+          }
+          votes.push(row);
+        }
+        const t0 = performance.now();
+        const rep = cloture.auditPanel(votes, gold, { strata, nCondorcetSims: 1000, nPerms: 1000, nBoot: 500, seed: 42 });
+        document.getElementById("panel-heading").textContent = "Live WASM Audit: Real ScalerLab JudgeBench (13 Frontier Models × 350 Objective Items)";
+        renderPanelReport(rep, performance.now() - t0, p.model_names);
+      } catch (e) {
+        alert("Failed to load real JudgeBench preset: " + e);
+      } finally {
+        btn.textContent = "Real JudgeBench (13 LLMs × 350 · o1 + Claude-3.5)";
+      }
+    }
+
     document.getElementById("btn-run-panel").addEventListener("click", () => {
       document.getElementById("panel-heading").textContent = "Live Rust WASM Panel Audit Receipt";
       runSimulatedPanel();
     });
     document.getElementById("btn-preset-rewardbench").addEventListener("click", runRealRewardBench);
+    document.getElementById("btn-preset-judgebench").addEventListener("click", runRealJudgeBench);
     document.getElementById("btn-preset-indep").addEventListener("click", () => {
       document.getElementById("panel-heading").textContent = "Live Rust WASM Panel Audit Receipt";
       document.getElementById("in-rho").value = 0; document.getElementById("lbl-rho").textContent = "0.00";
