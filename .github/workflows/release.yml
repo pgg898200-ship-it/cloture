@@ -102,7 +102,7 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET: "11.0"
         run: |
           mkdir -p release-assets
-          for pair in "aarch64-apple-darwin:aarch64:macosx_11_0_arm64" "x86_64-apple-darwin:x86_64:macosx_10_12_x86_64"; do
+          for pair in "aarch64-apple-darwin:aarch64:macosx_11_0_arm64" "x86_64-apple-darwin:x86_64:macosx_11_0_x86_64"; do
             IFS=: read -r TARGET ARCH PLAT <<< "$pair"
             cargo build --release --workspace --target "$TARGET"
             rm -rf stage && mkdir -p stage
@@ -156,10 +156,7 @@ jobs:
           mkdir -p release-assets stage
           cp target/release/cloture.exe stage/cloture.exe
           cp LICENSE NOTICE README.md include/cloture.h stage/
-          python3 -c "
-          import shutil
-          shutil.make_archive('release-assets/cloture-${{ steps.meta.outputs.tag }}-windows-x86_64', 'zip', 'stage')
-          "
+          python3 -c "import shutil; shutil.make_archive('release-assets/cloture-${{ steps.meta.outputs.tag }}-windows-x86_64', 'zip', 'stage')"
           python3 scripts/build_wheel.py \
             --lib target/release/cloture_core.dll \
             --plat-tag win_amd64 \
