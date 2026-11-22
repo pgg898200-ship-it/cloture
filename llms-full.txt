@@ -1,0 +1,86 @@
+# cloture — Complete Technical & API Reference (`llms-full.txt`)
+
+`cloture` is a zero-dependency Rust (`cloture-core`, `cloture-cli`), C ABI (`include/cloture.h`), and zero-dependency Python (`cloture`) statistical decision engine for low-latency, high-throughput multi-agent AI systems.
+
+- **Version:** `0.1.0` | **License:** `MIT` | **Repo:** `https://github.com/pgg898200-ship-it/cloture` | **Docs:** `https://pgg898200-ship-it.github.io/cloture`
+- **Dependencies:** `0` external Rust crates (`15`-line `Cargo.lock`), `0` Python runtime dependencies.
+- **Footprint:** `2.47 MiB` static CLI/MCP binary (`3.05 ms` cold start), `4.60 MiB` shared library (`1.25 MiB` compressed wheel), `26.5 ms` Python cold import, `76.7 µs` median MCP JSON-RPC tool roundtrip.
+- **Verification:** `266 / 266` tests passing (`55` Rust unit/Monte Carlo + `8` Python/CLI/MCP integration + `203` independent adversarial statistical, FFI, and fuzzing breaker tests).
+
+---
+
+## Quick Decision Guide (Which API to Use)
+
+1. **Best-of-N / multi-agent consensus with arbitrary outputs (code, SQL, strings, JSON):**
+   - Python async: `await cloture.consensus(spawn_fn, delta=0.05, max_calls=32, concurrency=8)`
+   - Python sync: `stopper = cloture.CiteStopper(delta=0.05, max_budget=32); dec = stopper.update(label_id)`
+   - CLI: `cat answers.txt | cloture stop --mode cite --delta 0.05`
+   - MCP tool: `cloture_mode_stop` (`mode: "cite"`)
+2. **Best-of-N / consensus when LLM logprobs or probability distributions over `K` options exist:**
+   - Helper: `probs = cloture.extract_logprob_distribution(top_logprobs, ["A", "B", "C", "D"])`
+   - Python async: `await cloture.consensus_dist(spawn_fn, extract_probs=..., labels=..., delta=0.05, max_calls=64)`
+   - Python sync: `stopper = cloture.AscdStopper(k=4, delta=0.05, max_budget=64); dec = stopper.update(probs)` (or `update_batch(probs_2d)`)
+   - CLI: `cat probs.jsonl | cloture stop --mode ascd --k 4 --delta 0.05`
+   - MCP tool: `cloture_mode_stop` (`mode: "ascd"`)
+3. **Certifying population-level superiority across prompts with correlated rollouts per prompt:**
+   - Python: `pop = cloture.PopulationCert(delta=0.05); dec = pop.add_unit(unit_scores_in_minus1_to_1); k_opt = pop.optimal_rollouts(setup_cost, rollout_cost)`
+   - MCP tool: `cloture_population_cert`
+4. **Auditing an LLM-as-a-judge / multi-agent voting panel for correlated errors (`n_eff`, Condorcet gap, LOO pruning):**
+   - Python batch: `rep = cloture.audit_panel(votes_2d, gold_1d, strata=None, n_condorcet_sims=2000, n_perms=2000, n_boot=1000, seed=42)`
+   - Python streaming: `tracker = cloture.OnlinePanelTracker(k_judges); tracker.observe(binary_errors); tracker.n_eff_kish(); tracker.n_eff_eigen()`
+   - CLI: `cloture audit --file panel.json --perms 2000 [--json]`
+   - MCP tool: `cloture_audit_panel`
+5. **Anytime-valid confidence sequences (zero p-hacking under continuous monitoring):**
+   - Fast `O(1)` EB-CS (`89 ns` Rust / `110 ns` Py batch): `cs = cloture.EmpiricalBernsteinCS(alpha=0.05, min_val=0.0, max_val=1.0); b = cs.update(x)` (or `update_batch(xs)`)
+   - Tightest finite-sample ONS Betting CS (`0.095` width @ 1k): `cs = cloture.BettingCS(alpha=0.05, grid_points=201); b = cs.update(x)`
+   - Paired A-vs-B e-process: `pe = cloture.PairedEProcess(alpha=0.05, scale=1.0); r = pe.update(a, b)`
+6. **Multi-arm sequential racing (policies, prompts, models) + arbitrary-dependence FDR:**
+   - Python async: `winner, evals, active = await cloture.race_agents(eval_fn, n_arms=6, tasks=tasks, delta=0.05, paired=True)`
+   - Python sync: `race = cloture.AgentRace(n_arms=6, delta=0.05, paired=True); race.observe_paired(scores)` or `race.next_arm_lucb()` + `race.observe_arm(arm, score)`
+   - Multiple testing: `indices = cloture.e_bh_discoveries(e_values, alpha=0.05)`
+   - CLI: `cat scores.jsonl | cloture race --delta 0.05 --paired`
+   - MCP tool: `cloture_agent_race`
+7. **Hybrid 100% LLM-judge + sparse ground-truth auditing (online anytime-valid Active-PPI++):**
+   - Python: `ppi = cloture.ActivePPI(alpha=0.05, target_audit_rate=0.10, min_audit_prob=0.05); pi = ppi.suggest_prob(f, u); res = ppi.observe(f, audited, y, pi)`
+   - CLI: `cat stream.jsonl | cloture ppi --alpha 0.05 --target-rate 0.10 --min-prob 0.05`
+   - MCP tool: `cloture_active_ppi`
+8. **Poisoning-resistant multi-agent fusion & auto-quarantine:**
+   - Python: `fuse = cloture.SafeFuse(n_agents=5, quarantine_alpha=0.01, fallback_alpha=0.05); val, fb = fuse.predict(preds); fuse.update(losses, baseline_loss=b)`
+   - MCP tool: `cloture_safe_fuse`
+9. **Recall-controlled multi-stage trajectory abort & online conformal shift adaptation:**
+   - Python: `cascade = cloture.AbortCascade.calibrate(scores_2d, succeeded_1d, target_recall=0.92); cascade.should_abort(stage, score)`
+   - Python: `oc = cloture.OnlineConformal(target_alpha=0.10); alpha_t = oc.update_pvalue(p)`
+10. **Distributed `<1 KB` associative/commutative fleet monoid with exact Leave-One-Out subtraction:**
+    - Python: `sk = cloture.EvidenceSketch(); sk.observe(score, bet_increment); wire = sk.to_bytes() # 712 bytes`; `sk.merge(other)`; `sk.subtract(local)`
+
+---
+
+## Verified Benchmark Summary (`benchmarks/results.json`)
+
+Measured on `Intel Xeon @ 2.30 GHz (2 vCPU)`, Python `3.12.16`, Rust `1.100.0`:
+
+- **Consensus Stopping (`delta = 0.05`, 200 trials):**
+  - `AscdStopper(K=4)`: Easy (`gap=0.45`) `21.0` calls (`100%` acc, `67.2%` saved vs Fixed-64, `91.8%` vs Fixed-256); Medium (`gap=0.25`) `38.7` calls (`100%` acc, `39.5%` saved vs Fixed-64); Hard (`gap=0.12`, `budget=64`) `55.4` calls (`99.0%` acc vs Fixed-64 `86.5%`); Exact-tie null `0.0%` false cert (vs Naive Peeking `28.5%`). Speed: `2.21 µs` Py batch (`28.9x` faster than NumPy `63.8 µs`, `25/25` exact stop parity).
+  - `CiteStopper` (unknown `K=200` Zipf): `70.9` calls on `gap=0.30` (`100%` acc, `72.3%` saved vs Fixed-256); Exact-tie null `0.5%` false cert (vs Naive Peeking `30.5%`). Speed: `247 ns` Py batch / `271 ns` Rust.
+- **Correlated-Panel Audit (`9 x 1,000`, 2k perms / 2k MC / 1k boot):** `317.7 ms` vs NumPy/SciPy `1,539.7 ms` (`4.8x` faster, `max_det_diff = 2.66e-15`). Exposes `2.21` Kish / `2.13` Eigen effective votes, `20.43 pp` Condorcet gap (`p = 0.0005`), and `+2.72 pp` accuracy gain (`-22.2%` cost) by dropping 2 redundant judges.
+- **Correlated Rollouts (`rho = 0.60`, `30 x 16`):** Null false-fire `0.7%` for `PopulationCert` vs `33.0%` Pooled Z, `40.0%` Pooled EB-CS, `17.3%` prompt-0 single-unit (`99.3%` any-prompt). Reallocating 480 rollouts from `30 x 16` to `120 x 4` increases power from `27.3%` to `88.0%`.
+- **CS & Racing vs. PyPI Competitors (`alpha = 0.05`):**
+  - `EmpiricalBernsteinCS`: `1.0%` anytime miscov, width `0.110 @ 1k`, `88.9 ns` Rust / `110.3 ns` Py batch (`4.0x` faster than `confseq.predmix_empbern_cs` `442 ns`; `219x` faster in 1-step Py streaming than `expectation` `1.13 ms`). Naive CLT peeking suffers `53.8%` miscov.
+  - `BettingCS(201)`: `3.6%` anytime miscov, width `0.095 @ 1k` (`28.4x` faster & tighter than `confseq.hedged_cs(201)` `179 µs`, width `0.119`).
+  - `AgentRace(paired=True)` (`6` arms, `200` tasks): `299.9` evals (`75.0%` saved, `100%` acc, `0.0%` null FWER); `11,112x` faster than `bayesbench.BayesianRanker` (`2.75 ms` vs `30,514 ms`). `PairedEProcess` is `959x` faster than `bayesbench.compare` with `0.0%` vs `40.0%` exact-tie null FPR.
+- **Active-PPI++ vs. `ppi-python`:** `99.0%` anytime coverage (`N=4,000`, `r=0.92`, `+0.15` bias, `10%` audit, width `0.146`, `6.29x` variance reduction, `1.46x` eff sample multiplier vs Human-Only EB-CS) while `ppi_py` collapses to `71.0%` under peeking every 200 items and naive judge gets `0.0%`. Under exact/noisy inverted judges (`f = 1 - y`), `ActivePPI` drives `lambda_hat = 0.0000` and maintains `99%–100%` anytime coverage.
+- **SafeFuse, AbortCascade, OnlineConformal, EvidenceSketch:**
+  - `SafeFuse`: `100%` dual-poison quarantine (median `94` steps), `0.0%` clean-null FWER, `1.24 µs` Rust update (`K=5`).
+  - `AbortCascade`: `92.6%` test recall (target `92%`) with `38.2%` failed compute saved (vs naive threshold `66.1%` recall).
+  - `OnlineConformal`: `64.5 ns` Rust (`2,930x` faster than `online-cp` `SimpleJumper` `188.9 µs`; `93.3x` faster in Python `2.02 µs`), post-shift coverage `94.4%` vs `online-cp` CRR `68.0%` and fixed `33.5%`.
+  - `EvidenceSketch`: `712 B` wire size, `76.3 ns` Rust merge, `0.0` exact mean/quantile diff on 1,000-worker fleet merge and LOO subtraction.
+
+---
+
+## Statistical Invariants & Safety Rules
+
+- `AscdStopper` uses the full `K`-arm Ville union bound `ln(K / delta)`, guaranteeing `FPR <= delta` even under boundary exact-tie nulls (`p = [0.5, 0.5]`).
+- `CiteStopper` uses post-discovery Kraft-IUT thresholds `ln(r(r+1) / delta)` plus optional deterministic budget lock (`error = 0` vs full-budget majority).
+- `SafeFuse` uses an unclamped Fan-inequality supermartingale over `max(LOO weighted mean, LOO median)` on a strictly `F_{t-1}`-predictable monotone scale, guaranteeing `FWER <= alpha` even under heavy-tailed/skewed nulls.
+- All C ABI entry points validate pointers/bounds and compile with `panic = "unwind"` + `catch_unwind` guards; `CiteStopper` returns full `uint64_t` label IDs with explicit `has_winner`/`has_leader` flags.
+- Never drop `min_audit_prob` to `0` in `ActivePPI`, and never treat a single-unit `AscdStopper`/`CiteStopper` certificate as a population claim across prompts (use `PopulationCert`).

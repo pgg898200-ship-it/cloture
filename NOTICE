@@ -1,0 +1,45 @@
+cloture
+Copyright (c) 2026 Cloture Contributors
+
+This software is licensed under the MIT License (see LICENSE).
+
+Third-Party Code Dependencies
+-----------------------------
+- Rust workspace (`cloture-core`, `cloture-cli`): ZERO external crate dependencies
+  (Rust standard library only; verified in Cargo.lock).
+- Python SDK (`cloture`): ZERO runtime package dependencies (Python standard
+  library ctypes bindings to libcloture_core).
+
+Mathematical & Literature Attributions
+--------------------------------------
+All algorithms in `cloture` are original clean-room implementations in Rust.
+Their statistical guarantees build on the following published literature:
+
+1. Predictable Plug-In Empirical-Bernstein & Hedged ONS Betting Confidence
+   Sequences:
+   I. Waudby-Smith & A. Ramdas, "Estimating means of bounded random variables
+   by betting," JRSS Series B (2024); X. Fan, I. Grama, Q. Liu, "Exponential
+   inequalities for martingales with applications," Electron. J. Probab. (2015).
+
+2. Anytime-Valid Mode & Unbounded Consensus Stopping (ASC-D, CITE, Kraft-IUT,
+   Deterministic Budget Lock, and Realized vs. Population Certification):
+   Sequential e-process / mixture-martingale mode certification and unit-level
+   clustered rollout aggregation frameworks (2025-2026).
+
+3. Correlated-Panel Diagnostics:
+   L. Kish (1965) design-effect effective sample size, eigenvalue spectral
+   effective rank, stratified Condorcet independence null Monte Carlo,
+   Krippendorff's alpha, and leave-one-out panel pruning.
+
+4. Multiple Testing & Active Prediction-Powered Inference:
+   R. Wang & A. Ramdas, "False discovery rate control with e-values," JRSS
+   Series B (2022); A. N. Angelopoulos, S. Bates, C. Fannjiang, M. I. Jordan,
+   T. Zrnic, "Prediction-Powered Inference," Science (2023); A. N. Angelopoulos,
+   J. C. Duchi, T. Zrnic, "PPI++: Efficient Prediction-Powered Inference" (2023);
+   T. Zrnic & E. J. Candès, "Active Statistical Inference" (ICML 2024).
+
+5. Safe Online Aggregation & Conformal Control:
+   I. Wintenberger, "Optimal learning with Bernstein Online Aggregation,"
+   Machine Learning (2017); A. N. Angelopoulos et al., "Conformal Risk Control"
+   (ICLR 2024); M. Zaffran et al., "Adaptive Conformal Predictions for Time
+   Series" (AgACI, ICML 2022).

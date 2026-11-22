@@ -1,0 +1,19 @@
+[package]
+name = "cloture-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description.workspace = true
+readme = "../../README.md"
+keywords = ["statistics", "ai-agents", "anytime-valid", "e-values", "conformal"]
+categories = ["science", "mathematics", "algorithms"]
+
+[lib]
+name = "cloture_core"
+crate-type = ["rlib", "cdylib", "staticlib"]
+
+[dependencies]
+# Zero external dependencies by design: instant builds, zero supply-chain risk,
+# maximum portability across Linux, macOS, Windows, and WASM.

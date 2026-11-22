@@ -1,0 +1,18 @@
+[package]
+name = "cloture-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Zero-dependency CLI and MCP server for cloture."
+readme = "../../README.md"
+keywords = ["cli", "mcp", "ai-agents", "anytime-valid", "statistics"]
+categories = ["command-line-utilities", "science"]
+
+[[bin]]
+name = "cloture"
+path = "src/main.rs"
+
+[dependencies]
+cloture-core = { path = "../cloture-core", version = "0.1.0" }

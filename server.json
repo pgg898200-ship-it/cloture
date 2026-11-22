@@ -1,0 +1,46 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.pgg898200-ship-it/cloture",
+  "description": "Zero-dependency Rust statistical engine for anytime-valid multi-agent consensus stopping, correlated judge-panel n_eff auditing, sequential agent racing, Active-PPI++, and poisoning-resistant fusion.",
+  "repository": {
+    "url": "https://github.com/pgg898200-ship-it/cloture",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "websiteUrl": "https://pgg898200-ship-it.github.io/cloture",
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/pgg898200-ship-it/cloture/releases/download/v0.1.0/cloture-v0.1.0-linux-x86_64.tar.gz",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ],
+  "tools": [
+    {
+      "name": "cloture_mode_stop",
+      "description": "Anytime-valid multi-agent consensus stopping (grey-box ASC-D over probability vectors or category-agnostic unbounded CITE over labels)."
+    },
+    {
+      "name": "cloture_audit_panel",
+      "description": "Audit an LLM-as-a-judge or multi-agent panel for correlated error collapse (Kish & eigenvalue n_eff, Condorcet gap, permutation p-value, LOO redundant-judge pruning)."
+    },
+    {
+      "name": "cloture_population_cert",
+      "description": "Unit-level population superiority certification across prompts under correlated rollouts with optimal rollouts-per-prompt allocation."
+    },
+    {
+      "name": "cloture_agent_race",
+      "description": "Sequential anytime-valid multi-arm agent/model racing with FWER control and Wang-Ramdas e-BH FDR discoveries."
+    },
+    {
+      "name": "cloture_active_ppi",
+      "description": "Anytime-valid Active Prediction-Powered Inference (Active-PPI++) combining cheap LLM judge scores with sparse human audits."
+    },
+    {
+      "name": "cloture_safe_fuse",
+      "description": "Poisoning-resistant multi-agent online aggregation (Scale-Free BOA + Fan-inequality Ville e-process quarantine)."
+    }
+  ]
+}

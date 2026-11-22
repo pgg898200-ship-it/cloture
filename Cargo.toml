@@ -1,0 +1,21 @@
+[workspace]
+members = [
+    "crates/cloture-core",
+    "crates/cloture-cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/pgg898200-ship-it/cloture"
+homepage = "https://pgg898200-ship-it.github.io/cloture"
+description = "Sub-microsecond anytime-valid consensus stopping, correlated-panel auditing, and active prediction-powered racing for multi-agent AI systems."
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "unwind"
+strip = false

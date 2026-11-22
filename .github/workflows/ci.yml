@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  rust-and-zero-dep-guard:
+    name: Rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify zero external dependencies
+        shell: python3 {0}
+        run: |
+          from pathlib import Path
+          lock = Path("Cargo.lock").read_text(encoding="utf-8")
+          pkgs = [line.split('"')[1] for line in lock.splitlines() if line.startswith("name = ")]
+          assert sorted(pkgs) == ["cloture-cli", "cloture-core"], f"Unexpected Cargo.lock packages: {pkgs}"
+          pyproj = Path("pyproject.toml").read_text(encoding="utf-8")
+          assert "dependencies = []" in pyproj, "pyproject.toml must declare dependencies = []"
+          print(f"Verified zero external deps: Rust packages = {pkgs}")
+
+      - name: Build release workspace (-D warnings)
+        env:
+          RUSTFLAGS: "-D warnings"
+        run: cargo build --release --workspace
+
+      - name: Run Rust workspace tests (release)
+        env:
+          RUSTFLAGS: "-D warnings"
+        run: cargo test --release --workspace
+
+      - name: Smoke-test CLI and built-in benchmark
+        shell: bash
+        run: |
+          BIN="./target/release/cloture"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            BIN="./target/release/cloture.exe"
+          fi
+          "$BIN" --version
+          "$BIN" bench
+
+  python-wheel-and-breaker:
+    name: Python Wheel & 211 Adversarial Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build release binary & shared library
+        env:
+          RUSTFLAGS: "-D warnings"
+        run: cargo build --release --workspace
+
+      - name: Build universal py3-none wheel
+        run: python3 scripts/build_wheel.py --out-dir dist
+
+      - name: Install wheel into isolated venv and verify zero-dep import
+        shell: bash
+        run: |
+          python3 -m venv .wheel-venv
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            PY="$PWD/.wheel-venv/Scripts/python.exe"
+          else
+            PY="$PWD/.wheel-venv/bin/python"
+          fi
+          "$PY" -m pip install --upgrade pip
+          "$PY" -m pip install dist/*.whl
+          # Verify import works from tempdir with zero repo paths or CLOTURE_LIB
+          (cd "$(python3 -c 'import tempfile; print(tempfile.gettempdir())')" && "$PY" -c "import cloture; s=cloture.CiteStopper(0.05); print(s.update(1))")
+          "$PY" -m pip install pytest numpy scipy
+          "$PY" -m pytest -v tests/test_python_sdk.py tests/breaker/
+          "$PY" examples/async_consensus_demo.py
+          "$PY" examples/audit_judge_panel.py
+          "$PY" examples/active_ppi_eval.py

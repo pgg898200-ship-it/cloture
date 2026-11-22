@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloture"
+version = "0.1.0"
+description = "Sub-microsecond anytime-valid consensus stopping, correlated-panel auditing, and active prediction-powered racing for multi-agent AI systems."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+keywords = [
+    "ai-agents",
+    "multi-agent",
+    "self-consistency",
+    "anytime-valid",
+    "e-values",
+    "prediction-powered-inference",
+    "llm-evaluation",
+    "conformal-prediction",
+    "sequential-testing",
+    "rust",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = []
+authors = [{ name = "Cloture Contributors" }]
+
+[project.urls]
+Homepage = "https://pgg898200-ship-it.github.io/cloture"
+Repository = "https://github.com/pgg898200-ship-it/cloture"
+Documentation = "https://github.com/pgg898200-ship-it/cloture#readme"
+Changelog = "https://github.com/pgg898200-ship-it/cloture/blob/main/CHANGELOG.md"
+Issues = "https://github.com/pgg898200-ship-it/cloture/issues"
+
+[project.optional-dependencies]
+numpy = ["numpy>=1.24"]
+dev = ["pytest>=8.0", "numpy>=1.24", "scipy>=1.11"]
+
+[tool.setuptools.packages.find]
+where = ["python"]
+include = ["cloture*"]
+
+[tool.setuptools.package-data]
+cloture = ["*.so", "*.dylib", "*.dll", "py.typed"]
